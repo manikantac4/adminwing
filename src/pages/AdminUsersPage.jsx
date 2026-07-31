@@ -18,7 +18,7 @@ export default function AdminUsersPage({ currentUser }) {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/admin/users", {
+      const res = await fetch("https://turingwings-backend.onrender.com/api/admin/users", {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
