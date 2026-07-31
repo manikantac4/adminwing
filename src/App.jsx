@@ -6,6 +6,8 @@ import AdminUsersPage from "./pages/AdminUsersPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminCallWidget from "./components/AdminCallWidget";
 
+const BACKEND_ADMIN_URL = "https://turingwings-backend.onrender.com/api/admin";
+
 function ProtectedRoute({ currentUser, children }) {
   const location = useLocation();
 
@@ -35,13 +37,46 @@ function AppContent() {
     }
   });
 
-  // Global Independent Meeting Call Overlay State (Persists across page changes!)
   const [isCallActive, setIsCallActive] = useState(false);
   const [roomInfo, setRoomInfo] = useState({ roomId: "TuringWings_MentorHQ_Call_2026" });
 
-  const handleStartGlobalCall = () => {
-    console.log("📞 Meeting Call Triggered by Owner:", currentUser?.name || "Lead Mentor");
+  // Start Meeting Call & Broadcast active status to MongoDB Atlas
+  const handleStartGlobalCall = async (customRoomId = null) => {
+    const selectedRoom = customRoomId || `TuringWings_Call_${Date.now()}`;
+    setRoomInfo({ roomId: selectedRoom });
     setIsCallActive(true);
+
+    try {
+      await fetch(`${BACKEND_ADMIN_URL}/calls`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          hostName: currentUser?.name || "Lead Mentor",
+          hostUsername: currentUser?.username || "admin",
+          roomId: selectedRoom,
+        }),
+      });
+    } catch {
+      // Offline fallback
+    }
+  };
+
+  // End Meeting Call & Clear active call broadcast
+  const handleEndGlobalCall = async () => {
+    setIsCallActive(false);
+
+    try {
+      await fetch(`${BACKEND_ADMIN_URL}/calls/end`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          hostUsername: currentUser?.username || "admin",
+          roomId: roomInfo.roomId,
+        }),
+      });
+    } catch {
+      // Fallback
+    }
   };
 
   return (
@@ -89,12 +124,12 @@ function AppContent() {
         />
       </Routes>
 
-      {/* Global Persistent Meeting Call Overlay (Continues uninterrupted when changing tabs or routes!) */}
+      {/* Global Persistent WebRTC Meeting Call Overlay */}
       {currentUser && (
         <AdminCallWidget
           currentUser={currentUser}
           isOpen={isCallActive}
-          onClose={() => setIsCallActive(false)}
+          onClose={handleEndGlobalCall}
           roomInfo={roomInfo}
         />
       )}

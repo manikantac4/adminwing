@@ -84,6 +84,7 @@ export default function AdminDashboardPage({ currentUser, onStartCall }) {
         currentUser={currentUser}
         unreadCount={2}
         toggleChatbot={() => setIsChatbotOpen(!isChatbotOpen)}
+        onStartCall={onStartCall}
       />
 
       <main className="max-w-7xl mx-auto w-full p-4 sm:p-8 overflow-y-auto text-left space-y-8 flex-1">

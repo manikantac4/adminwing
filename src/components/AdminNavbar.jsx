@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   ShieldCheck, LogOut, LayoutDashboard, Users, Menu, X, Bell,
-  MessageSquare, CheckCheck, User, ChevronDown
+  MessageSquare, CheckCheck, User, ChevronDown, PhoneCall, Radio, Video
 } from "lucide-react";
 
-export default function AdminNavbar({ currentUser, toggleChatbot }) {
+const BACKEND_ADMIN_URL = "https://turingwings-backend.onrender.com/api/admin";
+
+export default function AdminNavbar({ currentUser, toggleChatbot, onStartCall }) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -13,7 +15,9 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
   const [showNotifs, setShowNotifs] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState([]);
+  const [activeCallNotice, setActiveCallNotice] = useState(null);
 
+  // Poll Unread Messages
   const syncUnreadMessages = () => {
     const saved = localStorage.getItem("adminwing_chat_messages");
     if (saved) {
@@ -29,18 +33,36 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
     }
   };
 
+  // Poll Active Calls from MongoDB Atlas
+  const syncActiveCalls = async () => {
+    try {
+      const res = await fetch(`${BACKEND_ADMIN_URL}/calls`);
+      if (res.ok) {
+        const calls = await res.json();
+        if (Array.isArray(calls) && calls.length > 0) {
+          // Active call hosted by another mentor
+          const liveCall = calls.find((c) => c.active && c.hostUsername !== currentUser?.username);
+          setActiveCallNotice(liveCall || null);
+        } else {
+          setActiveCallNotice(null);
+        }
+      }
+    } catch {
+      setActiveCallNotice(null);
+    }
+  };
+
   useEffect(() => {
     syncUnreadMessages();
-    const interval = setInterval(syncUnreadMessages, 1000);
-    window.addEventListener("adminwing_messages_updated", syncUnreadMessages);
-    window.addEventListener("storage", syncUnreadMessages);
+    syncActiveCalls();
 
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener("adminwing_messages_updated", syncUnreadMessages);
-      window.removeEventListener("storage", syncUnreadMessages);
-    };
-  }, []);
+    const interval = setInterval(() => {
+      syncUnreadMessages();
+      syncActiveCalls();
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [currentUser]);
 
   const handleLogout = () => {
     localStorage.removeItem("turing_wings_user");
@@ -66,8 +88,29 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E5E7EB] py-2 px-3 sm:px-8 flex flex-col transition-all shadow-sm">
+      {/* REAL-TIME LIVE CALL NOTIFICATION BANNER */}
+      {activeCallNotice && (
+        <div className="mb-2 p-2 px-3.5 rounded-2xl bg-gradient-to-r from-[#18191B] via-[#2A2B2E] to-[#18191B] text-white flex items-center justify-between text-xs shadow-md border border-[#A39B89]/40 animate-pulse">
+          <div className="flex items-center gap-2">
+            <Radio className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>
+              <strong className="text-[#C9B27D]">{activeCallNotice.hostName}</strong> started a Live Meeting Call!
+            </span>
+          </div>
+
+          <button
+            onClick={() => {
+              if (onStartCall) onStartCall(activeCallNotice.roomId);
+            }}
+            className="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 shadow-md transition-transform hover:scale-105"
+          >
+            <PhoneCall className="w-3.5 h-3.5" />
+            <span>Join Call Now</span>
+          </button>
+        </div>
+      )}
+
       <div className="flex items-center justify-between w-full">
-        
         {/* Brand Logo & Title */}
         <div className="flex items-center gap-2 sm:gap-6">
           <Link to="/" className="flex items-center gap-2 group">
@@ -112,7 +155,6 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
 
         {/* Right Action Icons & User Dropdown */}
         <div className="flex items-center gap-1.5 sm:gap-3">
-          
           {/* Notification Bell Button */}
           <div className="relative">
             <button
@@ -190,7 +232,7 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
             )}
           </button>
 
-          {/* USER PROFILE CAPSULE WITH DROPDOWN (Contains Sign Out!) */}
+          {/* USER PROFILE CAPSULE */}
           <div className="relative border-l border-[#E5E7EB] pl-2 sm:pl-3">
             <button
               onClick={() => {
