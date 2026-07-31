@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ShieldCheck, LogOut, LayoutDashboard, Users, Menu, X, Bell, MessageSquare, CheckCheck } from "lucide-react";
+import {
+  ShieldCheck, LogOut, LayoutDashboard, Users, Menu, X, Bell,
+  MessageSquare, CheckCheck, User, ChevronDown
+} from "lucide-react";
 
 export default function AdminNavbar({ currentUser, toggleChatbot }) {
   const location = useLocation();
   const navigate = useNavigate();
+
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showNotifs, setShowNotifs] = useState(false);
-
-  // Dynamic state for REAL unread chatbot messages
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState([]);
 
   const syncUnreadMessages = () => {
@@ -28,11 +31,7 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
 
   useEffect(() => {
     syncUnreadMessages();
-
-    // CONTINUOUS REAL-TIME LIVE SYNC (Every 1000ms - No Page Refresh Required!)
     const interval = setInterval(syncUnreadMessages, 1000);
-
-    // Event listeners for cross-tab and local state updates
     window.addEventListener("adminwing_messages_updated", syncUnreadMessages);
     window.addEventListener("storage", syncUnreadMessages);
 
@@ -46,6 +45,7 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
   const handleLogout = () => {
     localStorage.removeItem("turing_wings_user");
     localStorage.removeItem("turing_wings_token");
+    setShowUserDropdown(false);
     navigate("/login");
   };
 
@@ -65,8 +65,9 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-[#E5E7EB] py-2.5 px-3 sm:px-8 flex flex-col transition-all shadow-sm">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E5E7EB] py-2 px-3 sm:px-8 flex flex-col transition-all shadow-sm">
       <div className="flex items-center justify-between w-full">
+        
         {/* Brand Logo & Title */}
         <div className="flex items-center gap-2 sm:gap-6">
           <Link to="/" className="flex items-center gap-2 group">
@@ -109,12 +110,16 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
           </nav>
         </div>
 
-        {/* Right Action Icons & User Info */}
+        {/* Right Action Icons & User Dropdown */}
         <div className="flex items-center gap-1.5 sm:gap-3">
+          
           {/* Notification Bell Button */}
           <div className="relative">
             <button
-              onClick={() => setShowNotifs(!showNotifs)}
+              onClick={() => {
+                setShowNotifs(!showNotifs);
+                setShowUserDropdown(false);
+              }}
               className="p-2 rounded-xl bg-[#F8F9FB] border border-[#E5E7EB] text-[#18191B] hover:bg-[#E5E7EB] transition-colors relative"
               title="Notifications"
             >
@@ -130,7 +135,7 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
             {showNotifs && (
               <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-white border border-[#E5E7EB] rounded-2xl shadow-xl p-3 z-50 text-left space-y-2">
                 <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
-                  <span className="text-xs font-bold text-[#18191B]">Live Chatbot Notifications</span>
+                  <span className="text-xs font-bold text-[#18191B]">Chatbot Notifications</span>
                   <span className="text-[10px] text-[#A39B89] font-bold">
                     {unreadMessages.length} Unread
                   </span>
@@ -185,29 +190,50 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
             )}
           </button>
 
-          {/* User Info Capsule */}
-          <div className="flex items-center gap-2 pl-1 sm:pl-3 border-l border-[#E5E7EB]">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#F8F9FB] border border-[#E5E7EB] flex items-center justify-center text-[#18191B] font-bold text-xs">
-              {currentUser?.name ? currentUser.name.charAt(0) : "A"}
-            </div>
-            <div className="text-left hidden lg:block">
-              <span className="text-xs font-bold text-[#18191B] block leading-none">
-                {currentUser?.name || "Lead Mentor"}
-              </span>
-              <span className="text-[10px] text-[#5E6168]">
-                @{currentUser?.username || "admin"}
-              </span>
-            </div>
-          </div>
+          {/* USER PROFILE CAPSULE WITH DROPDOWN (Contains Sign Out!) */}
+          <div className="relative border-l border-[#E5E7EB] pl-2 sm:pl-3">
+            <button
+              onClick={() => {
+                setShowUserDropdown(!showUserDropdown);
+                setShowNotifs(false);
+              }}
+              className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-[#F8F9FB] transition-colors"
+            >
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#18191B] text-[#C9B27D] border border-[#E5E7EB] flex items-center justify-center font-bold text-xs shadow-sm">
+                {currentUser?.name ? currentUser.name.charAt(0) : "A"}
+              </div>
+              <div className="text-left hidden lg:block">
+                <span className="text-xs font-bold text-[#18191B] block leading-none">
+                  {currentUser?.name || "Lead Mentor"}
+                </span>
+                <span className="text-[10px] text-[#5E6168]">
+                  @{currentUser?.username || "admin"}
+                </span>
+              </div>
+              <ChevronDown className="w-3.5 h-3.5 text-[#5E6168] hidden sm:inline" />
+            </button>
 
-          <button
-            onClick={handleLogout}
-            className="p-1.5 sm:p-2 rounded-xl bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-colors flex items-center gap-1 text-xs font-bold"
-            title="Sign Out"
-          >
-            <LogOut className="w-4 h-4" />
-            <span className="hidden sm:inline">Sign Out</span>
-          </button>
+            {/* Profile Dropdown Menu */}
+            {showUserDropdown && (
+              <div className="absolute right-0 mt-2 w-56 bg-white border border-[#E5E7EB] rounded-2xl shadow-xl p-2 z-50 text-left space-y-2">
+                <div className="p-2 border-b border-[#E5E7EB]">
+                  <p className="font-bold text-xs text-[#18191B]">{currentUser?.name || "Lead Mentor"}</p>
+                  <p className="text-[10px] text-[#5E6168]">@{currentUser?.username || "admin"}</p>
+                  <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-[#F8F9FB] border border-[#E5E7EB] text-[#A39B89]">
+                    LEAD MENTOR ADMIN
+                  </span>
+                </div>
+
+                <button
+                  onClick={handleLogout}
+                  className="w-full p-2 rounded-xl text-red-600 hover:bg-red-50 text-xs font-bold flex items-center gap-2 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* Mobile Hamburger Button */}
           <button
@@ -219,7 +245,7 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
         </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* Mobile Menu */}
       {mobileOpen && (
         <div className="md:hidden pt-3 pb-2 border-t border-[#E5E7EB] mt-2 space-y-1.5 text-left">
           {navLinks.map((link) => {
@@ -242,6 +268,14 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
               </Link>
             );
           })}
+
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Sign Out</span>
+          </button>
         </div>
       )}
     </header>

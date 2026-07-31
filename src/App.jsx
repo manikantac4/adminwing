@@ -1,9 +1,22 @@
 import React, { useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import AdminChatPage from "./pages/AdminChatPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
+
+function ProtectedRoute({ currentUser, children }) {
+  const location = useLocation();
+
+  if (!currentUser) {
+    // Save current path + query string so user returns here after logging in!
+    const targetUrl = location.pathname + location.search;
+    localStorage.setItem("post_login_redirect", targetUrl);
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+}
 
 function AppContent() {
   const [currentUser, setCurrentUser] = useState(() => {
@@ -27,31 +40,25 @@ function AppContent() {
       <Route
         path="/"
         element={
-          currentUser ? (
+          <ProtectedRoute currentUser={currentUser}>
             <AdminDashboardPage currentUser={currentUser} />
-          ) : (
-            <Navigate to="/login" replace />
-          )
+          </ProtectedRoute>
         }
       />
       <Route
         path="/chat"
         element={
-          currentUser ? (
+          <ProtectedRoute currentUser={currentUser}>
             <AdminChatPage currentUser={currentUser} />
-          ) : (
-            <Navigate to="/login" replace />
-          )
+          </ProtectedRoute>
         }
       />
       <Route
         path="/users"
         element={
-          currentUser ? (
+          <ProtectedRoute currentUser={currentUser}>
             <AdminUsersPage currentUser={currentUser} />
-          ) : (
-            <Navigate to="/login" replace />
-          )
+          </ProtectedRoute>
         }
       />
       <Route

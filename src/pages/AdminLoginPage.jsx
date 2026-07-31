@@ -31,6 +31,20 @@ export default function AdminLoginPage({ setCurrentUser }) {
         throw new Error("Access Denied: Account is not a registered Lead Mentor Admin.");
       }
 
+      // Explicitly trigger Google Password Manager Save Credential API if supported by browser
+      if (window.PasswordCredential && navigator.credentials) {
+        try {
+          const cred = new window.PasswordCredential({
+            id: formData.usernameOrEmail,
+            password: formData.password,
+            name: data.name || formData.usernameOrEmail,
+          });
+          await navigator.credentials.store(cred);
+        } catch {
+          // Native browser auto-fill handles fallback
+        }
+      }
+
       const sessionUser = {
         ...data,
         expiresAt: Date.now() + 3 * 60 * 60 * 1000,
@@ -43,7 +57,9 @@ export default function AdminLoginPage({ setCurrentUser }) {
       setSuccess(`Welcome Mentor ${data.name}! Authenticated successfully.`);
 
       setTimeout(() => {
-        navigate("/");
+        const targetRedirect = localStorage.getItem("post_login_redirect") || "/";
+        localStorage.removeItem("post_login_redirect");
+        navigate(targetRedirect);
       }, 1000);
     } catch (err) {
       setError(err.message || "Server connection error");
@@ -83,15 +99,19 @@ export default function AdminLoginPage({ setCurrentUser }) {
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        {/* Standard Form with Password Manager Autofill & Save Triggers */}
+        <form onSubmit={handleLogin} method="POST" action="#" className="space-y-4">
           <div>
-            <label className="block text-xs font-bold uppercase text-[#5E6168] mb-1">
+            <label htmlFor="admin-username" className="block text-xs font-bold uppercase text-[#5E6168] mb-1">
               Username or Email
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-[#8B9098] absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
+                id="admin-username"
+                name="username"
                 type="text"
+                autoComplete="username"
                 required
                 placeholder="Enter username or email"
                 value={formData.usernameOrEmail}
@@ -102,13 +122,16 @@ export default function AdminLoginPage({ setCurrentUser }) {
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase text-[#5E6168] mb-1">
+            <label htmlFor="admin-password" className="block text-xs font-bold uppercase text-[#5E6168] mb-1">
               Password
             </label>
             <div className="relative">
               <Lock className="w-4 h-4 text-[#8B9098] absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
+                id="admin-password"
+                name="password"
                 type="password"
+                autoComplete="current-password"
                 required
                 placeholder="••••••••••••"
                 value={formData.password}
