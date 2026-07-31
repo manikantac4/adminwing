@@ -7,7 +7,7 @@ import {
 import AdminNavbar from "../components/AdminNavbar";
 import AdminChatWidget from "../components/AdminChatWidget";
 
-export default function AdminDashboardPage({ currentUser }) {
+export default function AdminDashboardPage({ currentUser, onStartCall }) {
   const navigate = useNavigate();
 
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
@@ -277,6 +277,7 @@ export default function AdminDashboardPage({ currentUser }) {
         currentUser={currentUser}
         isOpen={isChatbotOpen}
         onClose={() => setIsChatbotOpen(false)}
+        onStartCall={onStartCall}
       />
     </div>
   );

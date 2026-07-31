@@ -3,7 +3,7 @@ import { Search, RefreshCw } from "lucide-react";
 import AdminNavbar from "../components/AdminNavbar";
 import AdminChatWidget from "../components/AdminChatWidget";
 
-export default function AdminUsersPage({ currentUser }) {
+export default function AdminUsersPage({ currentUser, onStartCall }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -76,7 +76,7 @@ export default function AdminUsersPage({ currentUser }) {
               placeholder="Search user name, email or role..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-[#E5E7EB] text-xs text-[#18191B] focus:outline-none focus:border-[#A39B89]"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFFFFF] border border-[#E5E7EB] text-xs text-[#18191B] focus:outline-none focus:border-[#A39B89]"
             />
           </div>
 
@@ -122,6 +122,7 @@ export default function AdminUsersPage({ currentUser }) {
         currentUser={currentUser}
         isOpen={isChatbotOpen}
         onClose={() => setIsChatbotOpen(false)}
+        onStartCall={onStartCall}
       />
     </div>
   );
