@@ -1,85 +1,65 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import {
   Send, Calendar, Layers, Database, CheckCircle2, ShieldCheck, Zap,
-  MessageSquare, Sparkles, Plus, Radio, ArrowRight
+  MessageSquare, Sparkles, Plus, Radio, ArrowRight, Eye, Settings, Trash2, RefreshCw
 } from "lucide-react";
 import AdminNavbar from "../components/AdminNavbar";
 import AdminChatWidget from "../components/AdminChatWidget";
+import AdminEventWizardModal from "../components/AdminEventWizardModal";
 
 export default function AdminDashboardPage({ currentUser }) {
   const navigate = useNavigate();
 
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Form state for publishing new Cohort/Hackathon to MongoDB Atlas
-  const [newEvent, setNewEvent] = useState({
-    title: "",
-    category: "48-Hour Hackathon",
-    startDate: "August 28, 2026",
-    description: "",
-    statusBadge: "REGISTRATIONS OPEN",
-  });
+  const fetchAdminEvents = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("https://turingwings-backend.onrender.com/api/events/admin/all");
+      if (res.ok) {
+        const data = await res.json();
+        setEvents(data);
+      }
+    } catch {
+      // Fallback
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const [isPublishing, setIsPublishing] = useState(false);
-  const [publishSuccess, setPublishSuccess] = useState(false);
+  useEffect(() => {
+    fetchAdminEvents();
+  }, []);
 
-  // Simulated live MongoDB Atlas Announcements Collection
-  const [publishedEvents, setPublishedEvents] = useState([
-    {
-      id: "1",
-      title: "Global Vibe Coding 48-Hour Sprint",
-      category: "48-Hour Hackathon",
-      startDate: "August 28, 2026",
-      description: "Build full-stack web applications with Cursor AI & Node.js swarms in 48 hours.",
-      statusBadge: "REGISTRATIONS OPEN",
-      publishedBy: "Pandu Ranga Tummuri",
-      createdAt: "Just now",
-    },
-    {
-      id: "2",
-      title: "Offensive Cyber Shield Bootcamp — Batch 01",
-      category: "Bootcamp Cohort",
-      startDate: "September 05, 2026",
-      description: "Master zero-trust cloud architecture, vulnerability scanning, and prompt injection defense.",
-      statusBadge: "UPCOMING SOON",
-      publishedBy: "Ratnakar Karasala",
-      createdAt: "2 hours ago",
-    },
-  ]);
+  const handleDeleteEvent = async (id, e) => {
+    e.stopPropagation();
+    if (!window.confirm("Are you sure you want to delete this event?")) return;
 
-  const handlePublishToUserWebsite = (e) => {
-    e.preventDefault();
-    if (!newEvent.title.trim() || !newEvent.description.trim()) return;
-
-    setIsPublishing(true);
-
-    setTimeout(() => {
-      const created = {
-        id: Date.now().toString(),
-        ...newEvent,
-        publishedBy: currentUser?.name || "Lead Mentor",
-        createdAt: "Just now",
-      };
-
-      setPublishedEvents((prev) => [created, ...prev]);
-      setIsPublishing(false);
-      setPublishSuccess(true);
-
-      setNewEvent({
-        title: "",
-        category: "48-Hour Hackathon",
-        startDate: "September 15, 2026",
-        description: "",
-        statusBadge: "REGISTRATIONS OPEN",
+    try {
+      const res = await fetch(`https://turingwings-backend.onrender.com/api/events/admin/${id}`, {
+        method: "DELETE",
       });
-
-      setTimeout(() => setPublishSuccess(false), 3000);
-    }, 800);
+      if (res.ok) {
+        fetchAdminEvents();
+      }
+    } catch {
+      alert("Failed to delete event");
+    }
   };
 
   return (
     <div className="min-h-screen bg-hero-gradient text-[#18191B] selection:bg-[#A39B89] selection:text-white flex flex-col font-sans">
+      {/* Event Wizard Modal */}
+      <AdminEventWizardModal
+        isOpen={isWizardOpen}
+        onClose={() => setIsWizardOpen(false)}
+        onEventCreated={() => fetchAdminEvents()}
+      />
+
       <AdminNavbar
         currentUser={currentUser}
         unreadCount={2}
@@ -87,8 +67,7 @@ export default function AdminDashboardPage({ currentUser }) {
       />
 
       <main className="max-w-7xl mx-auto w-full p-4 sm:p-8 overflow-y-auto text-left space-y-8 flex-1">
-        
-        {/* HERO HEADER SECTION WITH PREMIUM GRADIENT */}
+        {/* HERO COMMAND CENTER */}
         <div className="card-premium p-6 sm:p-8 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -99,180 +78,131 @@ export default function AdminDashboardPage({ currentUser }) {
                 </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold font-poppins text-[#18191B]">
-                Mentor Control Gateway & Announcement Publisher
+                Template-Based Event Generator & Management Portal
               </h1>
               <p className="text-xs text-[#5E6168] mt-1">
-                Manage upcoming cohorts, hackathons, and real-time mentor communications.
+                Launch professional Buildathons, Hackathons, AI Challenges & Workshops in seconds without writing frontend code.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsWizardOpen(true)}
+                className="px-5 py-3 rounded-xl bg-gradient-to-r from-[#18191B] via-[#A39B89] to-[#C9B27D] text-white font-bold text-xs shadow-lg hover:scale-105 transition-all flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4 text-white" />
+                <span>Create New Event</span>
+              </button>
+
+              <button
+                onClick={() => setIsChatbotOpen(!isChatbotOpen)}
+                className="btn-hero-gradient px-4 py-3 rounded-xl font-bold text-xs flex items-center gap-2 shadow-glow hover:scale-105 transition-all shrink-0"
+              >
+                <MessageSquare className="w-4 h-4 text-[#C9B27D]" />
+                <span className="hidden sm:inline">Chatbot</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* EVENT MANAGED DIRECTORY GRID */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold font-poppins text-[#18191B]">
+                Active Managed Events Directory ({events.length})
+              </h2>
+              <p className="text-xs text-[#5E6168]">
+                Real-time MongoDB Atlas event database synced across public site and admin dashboards.
               </p>
             </div>
 
             <button
-              onClick={() => setIsChatbotOpen(!isChatbotOpen)}
-              className="btn-hero-gradient px-5 py-3 rounded-xl font-bold text-xs flex items-center gap-2 shadow-glow hover:scale-105 transition-all shrink-0"
+              onClick={fetchAdminEvents}
+              className="px-3.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-xs font-bold text-[#18191B] hover:bg-[#F8F9FB] flex items-center gap-1.5"
             >
-              <MessageSquare className="w-4 h-4 text-[#C9B27D]" />
-              <span>Open Mentor Chatbot Hub</span>
+              <RefreshCw className={`w-3.5 h-3.5 text-[#A39B89] ${loading ? "animate-spin" : ""}`} />
+              <span>Refresh Events</span>
             </button>
           </div>
-        </div>
 
-        {/* MONGODB EVENT & COHORT ANNOUNCEMENT PUBLISHER */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Form: Post New Cohort / Hackathon */}
-          <div className="lg:col-span-6 card-premium p-6 sm:p-8 space-y-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-[#F8F9FB] border border-[#E5E7EB] flex items-center justify-center text-[#18191B] font-bold">
-                <Database className="w-5 h-5 text-[#A39B89]" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold font-poppins text-[#18191B]">
-                  MongoDB Event & Cohort Publisher
-                </h2>
-                <p className="text-xs text-[#5E6168]">
-                  Post new Cohorts/Hackathons directly to user website database
-                </p>
-              </div>
-            </div>
-
-            {publishSuccess && (
-              <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2 font-bold">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Published to MongoDB Atlas! User website will auto-retrieve.</span>
-              </div>
-            )}
-
-            <form onSubmit={handlePublishToUserWebsite} className="space-y-4 text-xs">
-              <div>
-                <label className="block font-bold uppercase text-[#5E6168] mb-1">
-                  Title / Event Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. AI-Powered MERN Hackathon 2026"
-                  value={newEvent.title}
-                  onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#E5E7EB] text-xs text-[#18191B] focus:outline-none focus:border-[#A39B89]"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-bold uppercase text-[#5E6168] mb-1">
-                    Category
-                  </label>
-                  <select
-                    value={newEvent.category}
-                    onChange={(e) => setNewEvent({ ...newEvent, category: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#E5E7EB] text-xs text-[#18191B] focus:outline-none focus:border-[#A39B89]"
-                  >
-                    <option value="48-Hour Hackathon">48-Hour Hackathon</option>
-                    <option value="Bootcamp Cohort">Bootcamp Cohort</option>
-                    <option value="Live Masterclass">Live Masterclass</option>
-                    <option value="Community Sprint">Community Sprint</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-bold uppercase text-[#5E6168] mb-1">
-                    Status Badge
-                  </label>
-                  <select
-                    value={newEvent.statusBadge}
-                    onChange={(e) => setNewEvent({ ...newEvent, statusBadge: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#E5E7EB] text-xs text-[#18191B] focus:outline-none focus:border-[#A39B89]"
-                  >
-                    <option value="REGISTRATIONS OPEN">REGISTRATIONS OPEN</option>
-                    <option value="UPCOMING SOON">UPCOMING SOON</option>
-                    <option value="LIVE NOW">LIVE NOW</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-bold uppercase text-[#5E6168] mb-1">
-                  Target Start Date
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. August 28, 2026"
-                  value={newEvent.startDate}
-                  onChange={(e) => setNewEvent({ ...newEvent, startDate: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#E5E7EB] text-xs text-[#18191B] focus:outline-none focus:border-[#A39B89]"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold uppercase text-[#5E6168] mb-1">
-                  Description / Syllabus Summary
-                </label>
-                <textarea
-                  rows="3"
-                  required
-                  placeholder="Describe the cohort, rules, or curriculum details..."
-                  value={newEvent.description}
-                  onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#E5E7EB] text-xs text-[#18191B] focus:outline-none focus:border-[#A39B89]"
-                />
-              </div>
-
+          {events.length === 0 ? (
+            <div className="card-premium p-12 text-center space-y-3">
+              <Sparkles className="w-8 h-8 text-[#A39B89] mx-auto opacity-50" />
+              <h3 className="text-base font-bold text-[#18191B]">No events generated yet</h3>
+              <p className="text-xs text-[#5E6168] max-w-md mx-auto">
+                Click "Create New Event" to launch the 5-step template wizard and publish your first Buildathon!
+              </p>
               <button
-                type="submit"
-                disabled={isPublishing}
-                className="w-full py-3.5 btn-primary-custom font-bold text-xs shadow-md flex items-center justify-center gap-2"
+                onClick={() => setIsWizardOpen(true)}
+                className="px-5 py-2.5 rounded-xl bg-[#18191B] text-white font-bold text-xs hover:bg-[#A39B89] transition-all inline-flex items-center gap-2"
               >
-                <Send className="w-4 h-4 text-[#C9B27D]" />
-                <span>{isPublishing ? "Saving to MongoDB..." : "Publish to User Website (Save to MongoDB)"}</span>
+                <Plus className="w-4 h-4" />
+                <span>Create First Event</span>
               </button>
-            </form>
-          </div>
-
-          {/* Live Stream: Published Events fetched by User Website */}
-          <div className="lg:col-span-6 card-premium p-6 sm:p-8 space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Layers className="w-5 h-5 text-[#A39B89]" />
-                <h2 className="text-xl font-bold font-poppins text-[#18191B]">
-                  Published Live Announcements
-                </h2>
-              </div>
-              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-[#F8F9FB] text-[#18191B] border border-[#E5E7EB]">
-                AUTO-RETRIEVED ON WEBSITE
-              </span>
             </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {events.map((evt) => (
+                <div
+                  key={evt._id}
+                  onClick={() => navigate(`/events/${evt._id}`)}
+                  className="card-premium p-6 rounded-3xl space-y-4 cursor-pointer hover:border-[#A39B89] transition-all hover:scale-[1.01] flex flex-col justify-between"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase bg-[#18191B] text-white">
+                        {evt.eventType}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase bg-[#F8F9FB] border border-[#E5E7EB] text-[#A39B89]">
+                        {evt.status}
+                      </span>
+                    </div>
 
-            <div className="space-y-4 max-h-[460px] overflow-y-auto pr-1">
-              {publishedEvents.map((evt) => (
-                <div key={evt.id} className="p-5 rounded-2xl bg-white border border-[#E5E7EB] shadow-sm space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-[#F8F9FB] border border-[#E5E7EB] text-[#18191B]">
-                      {evt.statusBadge}
-                    </span>
+                    <div>
+                      <h3 className="text-lg font-bold font-poppins text-[#18191B] line-clamp-1">{evt.title}</h3>
+                      <p className="text-xs text-[#5E6168] line-clamp-2 mt-1">{evt.tagline}</p>
+                    </div>
 
-                    <span className="text-[10px] text-[#5E6168] font-mono flex items-center gap-1 font-bold">
-                      <Calendar className="w-3 h-3 text-[#A39B89]" />
-                      {evt.startDate}
-                    </span>
+                    <div className="pt-3 border-t border-[#E5E7EB] grid grid-cols-3 gap-2 text-center text-[10px] font-mono">
+                      <div>
+                        <span className="text-[#5E6168] block">TEMPLATE</span>
+                        <span className="font-bold text-[#18191B]">{evt.templateId}</span>
+                      </div>
+                      <div>
+                        <span className="text-[#5E6168] block">PRIZE POOL</span>
+                        <span className="font-bold text-[#C9B27D]">{evt.prizePool}</span>
+                      </div>
+                      <div>
+                        <span className="text-[#5E6168] block">APPLICANTS</span>
+                        <span className="font-bold text-emerald-600">{evt.analytics?.registrationsCount || evt.participants?.length || 0}</span>
+                      </div>
+                    </div>
                   </div>
 
-                  <h3 className="text-base font-bold text-[#18191B] font-poppins">{evt.title}</h3>
-                  <p className="text-xs text-[#5E6168] leading-relaxed">{evt.description}</p>
-
-                  <div className="pt-2 border-t border-[#E5E7EB] flex items-center justify-between text-[10px] text-[#8B9098] font-mono font-semibold">
-                    <span>Category: {evt.category}</span>
-                    <span>By: {evt.publishedBy}</span>
+                  <div className="pt-3 border-t border-[#E5E7EB] flex items-center justify-between text-xs">
+                    <span className="text-[#5E6168] font-mono text-[10px]">Click to Manage</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => handleDeleteEvent(evt._id, e)}
+                        className="p-1.5 rounded-lg text-red-500 hover:bg-red-50"
+                        title="Delete Event"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                      <span className="font-bold text-[#18191B] flex items-center gap-1">
+                        <span>Dashboard</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-[#A39B89]" />
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-
+          )}
         </div>
-
       </main>
 
-      {/* FLOATING INTERACTIVE CHATBOT WIDGET */}
       <AdminChatWidget
         currentUser={currentUser}
         isOpen={isChatbotOpen}

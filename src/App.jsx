@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
+import AdminEventDashboardPage from "./pages/AdminEventDashboardPage";
 import AdminChatPage from "./pages/AdminChatPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
@@ -41,6 +42,14 @@ function AppContent() {
         element={
           <ProtectedRoute currentUser={currentUser}>
             <AdminDashboardPage currentUser={currentUser} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/events/:id"
+        element={
+          <ProtectedRoute currentUser={currentUser}>
+            <AdminEventDashboardPage currentUser={currentUser} />
           </ProtectedRoute>
         }
       />
