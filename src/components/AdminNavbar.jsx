@@ -29,11 +29,15 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
   useEffect(() => {
     syncUnreadMessages();
 
-    // Listen for custom message update events
+    // CONTINUOUS REAL-TIME LIVE SYNC (Every 1000ms - No Page Refresh Required!)
+    const interval = setInterval(syncUnreadMessages, 1000);
+
+    // Event listeners for cross-tab and local state updates
     window.addEventListener("adminwing_messages_updated", syncUnreadMessages);
     window.addEventListener("storage", syncUnreadMessages);
 
     return () => {
+      clearInterval(interval);
       window.removeEventListener("adminwing_messages_updated", syncUnreadMessages);
       window.removeEventListener("storage", syncUnreadMessages);
     };
@@ -126,7 +130,7 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
             {showNotifs && (
               <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-white border border-[#E5E7EB] rounded-2xl shadow-xl p-3 z-50 text-left space-y-2">
                 <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
-                  <span className="text-xs font-bold text-[#18191B]">Chatbot Notifications</span>
+                  <span className="text-xs font-bold text-[#18191B]">Live Chatbot Notifications</span>
                   <span className="text-[10px] text-[#A39B89] font-bold">
                     {unreadMessages.length} Unread
                   </span>

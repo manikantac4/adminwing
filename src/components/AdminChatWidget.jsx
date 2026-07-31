@@ -60,22 +60,49 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose, onMarkAl
   const docInputRef = useRef(null);
   const messagesEndRef = useRef(null);
 
-  // Sync to localStorage
+  // Sync state to storage
+  const syncToStorage = (newMsgs) => {
+    localStorage.setItem("adminwing_chat_messages", JSON.stringify(newMsgs));
+    window.dispatchEvent(new Event("adminwing_messages_updated"));
+  };
+
+  // CONTINUOUS LIVE SYNC (Polling every 1000ms - No Page Refresh Required!)
   useEffect(() => {
-    localStorage.setItem("adminwing_chat_messages", JSON.stringify(messages));
+    const pollInterval = setInterval(() => {
+      const savedMsgs = localStorage.getItem("adminwing_chat_messages");
+      if (savedMsgs) {
+        try {
+          const parsed = JSON.parse(savedMsgs);
+          if (JSON.stringify(parsed) !== JSON.stringify(messages)) {
+            setMessages(parsed);
+          }
+        } catch {}
+      }
+
+      const savedMedia = localStorage.getItem("adminwing_media_files");
+      if (savedMedia) {
+        try {
+          const parsedMedia = JSON.parse(savedMedia);
+          if (JSON.stringify(parsedMedia) !== JSON.stringify(mediaCollection)) {
+            setMediaCollection(parsedMedia);
+          }
+        } catch {}
+      }
+    }, 1000);
+
+    return () => clearInterval(pollInterval);
+  }, [messages, mediaCollection]);
+
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  useEffect(() => {
-    localStorage.setItem("adminwing_media_files", JSON.stringify(mediaCollection));
-  }, [mediaCollection]);
-
-  // When Chatbot is opened, mark all unread messages as read!
+  // When Chatbot is opened, mark all unread messages as read automatically!
   useEffect(() => {
     if (isOpen) {
       setMessages((prev) => {
         const updated = prev.map((m) => ({ ...m, read: true }));
-        localStorage.setItem("adminwing_chat_messages", JSON.stringify(updated));
+        syncToStorage(updated);
         return updated;
       });
       if (onMarkAllRead) onMarkAllRead();
@@ -97,28 +124,29 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose, onMarkAl
       read: true,
     };
 
-    setMessages((prev) => [...prev, newMsg]);
+    const updated = [...messages, newMsg];
+    setMessages(updated);
+    syncToStorage(updated);
     setText("");
     setShowStickers(false);
 
-    // Auto-reply bot simulation after 2 seconds to generate a REAL unread notification if chat closed
+    // Live Auto-Reply Simulation after 2.5 seconds (Updates state & notifications live without refresh)
     setTimeout(() => {
       const autoReply = {
         id: (Date.now() + 1).toString(),
         sender: "Ratnakar Karasala",
         role: "Cybersecurity Lead",
-        text: "Got your message! Systems are running at 100% capacity.",
+        text: "Got your message! Zero-Trust security protocols and backend APIs are operating at 100% efficiency.",
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         type: "text",
         isMe: false,
-        read: false,
+        read: isOpen ? true : false,
       };
 
       setMessages((latest) => {
-        const updated = [...latest, autoReply];
-        localStorage.setItem("adminwing_chat_messages", JSON.stringify(updated));
-        window.dispatchEvent(new Event("adminwing_messages_updated"));
-        return updated;
+        const nextMsgs = [...latest, autoReply];
+        syncToStorage(nextMsgs);
+        return nextMsgs;
       });
     }, 2500);
   };
@@ -135,7 +163,9 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose, onMarkAl
       read: true,
     };
 
-    setMessages((prev) => [...prev, newMsg]);
+    const updated = [...messages, newMsg];
+    setMessages(updated);
+    syncToStorage(updated);
     setShowStickers(false);
   };
 
@@ -166,8 +196,14 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose, onMarkAl
         read: true,
       };
 
-      setMessages((prev) => [...prev, newMsg]);
-      setMediaCollection((prev) => [mediaEntry, ...prev]);
+      const updatedMsgs = [...messages, newMsg];
+      const updatedMedia = [mediaEntry, ...mediaCollection];
+
+      setMessages(updatedMsgs);
+      setMediaCollection(updatedMedia);
+
+      syncToStorage(updatedMsgs);
+      localStorage.setItem("adminwing_media_files", JSON.stringify(updatedMedia));
     };
 
     reader.readAsDataURL(file);
@@ -203,8 +239,9 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose, onMarkAl
             <h3 className="text-xs sm:text-sm font-bold font-poppins text-white leading-none">
               Mentor Chatbot Hub
             </h3>
-            <span className="text-[9px] sm:text-[10px] text-[#C9B27D] font-medium block mt-0.5">
-              Live Storage Sync • Real Notifications
+            <span className="text-[9px] sm:text-[10px] text-[#C9B27D] font-medium block mt-0.5 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Live Continuous Sync • No Refresh Needed
             </span>
           </div>
         </div>
@@ -239,7 +276,7 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose, onMarkAl
         </div>
       </div>
 
-      {/* Main Container */}
+      {/* Main Content */}
       <div className="flex-1 flex flex-col justify-between bg-[#F8F9FB] p-3 sm:p-4 overflow-hidden">
         {showMediaFolder ? (
           <div className="flex-1 overflow-y-auto space-y-3 pr-1">
