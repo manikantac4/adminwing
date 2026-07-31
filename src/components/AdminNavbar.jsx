@@ -1,12 +1,43 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ShieldCheck, LogOut, LayoutDashboard, Users, Menu, X, Bell, MessageSquare } from "lucide-react";
+import { ShieldCheck, LogOut, LayoutDashboard, Users, Menu, X, Bell, MessageSquare, CheckCheck } from "lucide-react";
 
-export default function AdminNavbar({ currentUser, unreadCount = 2, toggleChatbot }) {
+export default function AdminNavbar({ currentUser, toggleChatbot }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showNotifs, setShowNotifs] = useState(false);
+
+  // Dynamic state for REAL unread chatbot messages
+  const [unreadMessages, setUnreadMessages] = useState([]);
+
+  const syncUnreadMessages = () => {
+    const saved = localStorage.getItem("adminwing_chat_messages");
+    if (saved) {
+      try {
+        const msgs = JSON.parse(saved);
+        const unread = msgs.filter((m) => !m.isMe && !m.read);
+        setUnreadMessages(unread);
+      } catch {
+        setUnreadMessages([]);
+      }
+    } else {
+      setUnreadMessages([]);
+    }
+  };
+
+  useEffect(() => {
+    syncUnreadMessages();
+
+    // Listen for custom message update events
+    window.addEventListener("adminwing_messages_updated", syncUnreadMessages);
+    window.addEventListener("storage", syncUnreadMessages);
+
+    return () => {
+      window.removeEventListener("adminwing_messages_updated", syncUnreadMessages);
+      window.removeEventListener("storage", syncUnreadMessages);
+    };
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("turing_wings_user");
@@ -14,14 +45,19 @@ export default function AdminNavbar({ currentUser, unreadCount = 2, toggleChatbo
     navigate("/login");
   };
 
+  const markNotificationAsRead = (id) => {
+    const saved = localStorage.getItem("adminwing_chat_messages");
+    if (saved) {
+      const msgs = JSON.parse(saved);
+      const updated = msgs.map((m) => (m.id === id ? { ...m, read: true } : m));
+      localStorage.setItem("adminwing_chat_messages", JSON.stringify(updated));
+      syncUnreadMessages();
+    }
+  };
+
   const navLinks = [
     { name: "Home", path: "/", icon: LayoutDashboard },
     { name: "Admin Directory", path: "/users", icon: Users },
-  ];
-
-  const notificationsList = [
-    { id: "1", title: "New Announcement Published", time: "5m ago", type: "system" },
-    { id: "2", title: "Chatbot Message from Ratnakar Karasala", time: "12m ago", type: "chat" },
   ];
 
   return (
@@ -79,27 +115,51 @@ export default function AdminNavbar({ currentUser, unreadCount = 2, toggleChatbo
               title="Notifications"
             >
               <Bell className="w-4 h-4 text-[#18191B]" />
-              {unreadCount > 0 && (
+              {unreadMessages.length > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center animate-pulse">
-                  {unreadCount}
+                  {unreadMessages.length}
                 </span>
               )}
             </button>
 
             {/* Notification Dropdown */}
             {showNotifs && (
-              <div className="absolute right-0 mt-2 w-72 bg-white border border-[#E5E7EB] rounded-2xl shadow-xl p-3 z-50 text-left space-y-2">
+              <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-white border border-[#E5E7EB] rounded-2xl shadow-xl p-3 z-50 text-left space-y-2">
                 <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
-                  <span className="text-xs font-bold text-[#18191B]">Notifications</span>
-                  <span className="text-[10px] text-[#A39B89] font-bold">{notificationsList.length} New</span>
+                  <span className="text-xs font-bold text-[#18191B]">Chatbot Notifications</span>
+                  <span className="text-[10px] text-[#A39B89] font-bold">
+                    {unreadMessages.length} Unread
+                  </span>
                 </div>
-                <div className="space-y-1.5 max-h-48 overflow-y-auto">
-                  {notificationsList.map((n) => (
-                    <div key={n.id} className="p-2 rounded-xl bg-[#F8F9FB] text-xs space-y-0.5">
-                      <p className="font-bold text-[#18191B] text-[11px]">{n.title}</p>
-                      <span className="text-[10px] text-[#8B9098]">{n.time}</span>
+
+                <div className="space-y-1.5 max-h-56 overflow-y-auto">
+                  {unreadMessages.length === 0 ? (
+                    <div className="py-6 text-center text-[#8B9098] space-y-1">
+                      <CheckCheck className="w-5 h-5 mx-auto text-[#A39B89]" />
+                      <p className="text-xs font-bold">All caught up!</p>
+                      <p className="text-[10px]">No unread messages from chatbot.</p>
                     </div>
-                  ))}
+                  ) : (
+                    unreadMessages.map((n) => (
+                      <div
+                        key={n.id}
+                        onClick={() => {
+                          markNotificationAsRead(n.id);
+                          setShowNotifs(false);
+                          toggleChatbot();
+                        }}
+                        className="p-2.5 rounded-xl bg-[#F8F9FB] border border-[#E5E7EB] hover:border-[#A39B89] text-xs space-y-1 cursor-pointer transition-all"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-[#18191B] text-[11px]">{n.sender}</span>
+                          <span className="text-[9px] text-[#8B9098]">{n.time}</span>
+                        </div>
+                        <p className="text-[#5E6168] text-[11px] line-clamp-2 leading-relaxed">
+                          {n.text || (n.type === "image" ? "📷 Sent a photo" : "📄 Sent a document")}
+                        </p>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             )}
@@ -107,12 +167,18 @@ export default function AdminNavbar({ currentUser, unreadCount = 2, toggleChatbo
 
           {/* Chatbot Launcher Button */}
           <button
-            onClick={toggleChatbot}
-            className="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-[#18191B] hover:bg-[#A39B89] text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5"
+            onClick={() => {
+              syncUnreadMessages();
+              toggleChatbot();
+            }}
+            className="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-[#18191B] hover:bg-[#A39B89] text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5 relative"
             title="Open Chatbot Hub"
           >
             <MessageSquare className="w-4 h-4 text-[#C9B27D]" />
             <span className="hidden sm:inline">Mentor Chatbot</span>
+            {unreadMessages.length > 0 && (
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-ping absolute top-1 right-1" />
+            )}
           </button>
 
           {/* User Info Capsule */}

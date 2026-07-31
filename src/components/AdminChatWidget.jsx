@@ -13,6 +13,7 @@ const INITIAL_MESSAGES = [
     time: "08:15 AM",
     type: "text",
     isMe: false,
+    read: false,
   },
   {
     id: "2",
@@ -22,6 +23,7 @@ const INITIAL_MESSAGES = [
     time: "08:18 AM",
     type: "text",
     isMe: false,
+    read: false,
   },
   {
     id: "3",
@@ -31,12 +33,13 @@ const INITIAL_MESSAGES = [
     time: "08:20 AM",
     type: "text",
     isMe: true,
+    read: true,
   },
 ];
 
 const STICKERS = ["🚀", "💻", "🛡️", "🔥", "⚡", "🥇", "🌐", "🔒", "🎉", "🧠"];
 
-export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
+export default function AdminChatWidget({ currentUser, isOpen, onClose, onMarkAllRead }) {
   const [messages, setMessages] = useState(() => {
     const saved = localStorage.getItem("adminwing_chat_messages");
     return saved ? JSON.parse(saved) : INITIAL_MESSAGES;
@@ -57,6 +60,7 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
   const docInputRef = useRef(null);
   const messagesEndRef = useRef(null);
 
+  // Sync to localStorage
   useEffect(() => {
     localStorage.setItem("adminwing_chat_messages", JSON.stringify(messages));
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -65,6 +69,18 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
   useEffect(() => {
     localStorage.setItem("adminwing_media_files", JSON.stringify(mediaCollection));
   }, [mediaCollection]);
+
+  // When Chatbot is opened, mark all unread messages as read!
+  useEffect(() => {
+    if (isOpen) {
+      setMessages((prev) => {
+        const updated = prev.map((m) => ({ ...m, read: true }));
+        localStorage.setItem("adminwing_chat_messages", JSON.stringify(updated));
+        return updated;
+      });
+      if (onMarkAllRead) onMarkAllRead();
+    }
+  }, [isOpen]);
 
   const handleSendMessage = (e) => {
     e?.preventDefault();
@@ -78,11 +94,33 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
       time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       type: "text",
       isMe: true,
+      read: true,
     };
 
     setMessages((prev) => [...prev, newMsg]);
     setText("");
     setShowStickers(false);
+
+    // Auto-reply bot simulation after 2 seconds to generate a REAL unread notification if chat closed
+    setTimeout(() => {
+      const autoReply = {
+        id: (Date.now() + 1).toString(),
+        sender: "Ratnakar Karasala",
+        role: "Cybersecurity Lead",
+        text: "Got your message! Systems are running at 100% capacity.",
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        type: "text",
+        isMe: false,
+        read: false,
+      };
+
+      setMessages((latest) => {
+        const updated = [...latest, autoReply];
+        localStorage.setItem("adminwing_chat_messages", JSON.stringify(updated));
+        window.dispatchEvent(new Event("adminwing_messages_updated"));
+        return updated;
+      });
+    }, 2500);
   };
 
   const handleSendSticker = (sticker) => {
@@ -94,6 +132,7 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
       time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       type: "sticker",
       isMe: true,
+      read: true,
     };
 
     setMessages((prev) => [...prev, newMsg]);
@@ -124,6 +163,7 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
         ...mediaEntry,
         role: "Lead Mentor",
         isMe: true,
+        read: true,
       };
 
       setMessages((prev) => [...prev, newMsg]);
@@ -144,7 +184,7 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
           : "inset-0 sm:inset-auto sm:bottom-4 sm:right-4 sm:w-[420px] sm:h-[540px] sm:rounded-3xl w-full h-full rounded-none"
       }`}
     >
-      {/* Mobile & Desktop Header */}
+      {/* Header */}
       <div className="bg-[#18191B] p-3.5 sm:p-4 text-white flex items-center justify-between shrink-0 shadow-md">
         <div className="flex items-center gap-2.5 sm:gap-3">
           <button
@@ -164,13 +204,12 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
               Mentor Chatbot Hub
             </h3>
             <span className="text-[9px] sm:text-[10px] text-[#C9B27D] font-medium block mt-0.5">
-              Live Media Sync • Full Screen Supported
+              Live Storage Sync • Real Notifications
             </span>
           </div>
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Media Folder Toggle */}
           <button
             onClick={() => setShowMediaFolder(!showMediaFolder)}
             className={`px-2 py-1 rounded-lg border text-xs font-bold transition-all flex items-center gap-1.5 ${
@@ -182,7 +221,6 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
             <span className="text-[10px] font-bold">{mediaCollection.length}</span>
           </button>
 
-          {/* Expand / Minimize Toggle */}
           <button
             onClick={() => setIsFullscreen(!isFullscreen)}
             className="hidden sm:flex p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
@@ -191,7 +229,6 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
 
-          {/* Close Button */}
           <button
             onClick={onClose}
             className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
@@ -202,10 +239,8 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
         </div>
       </div>
 
-      {/* Main Chat & Media Container */}
+      {/* Main Container */}
       <div className="flex-1 flex flex-col justify-between bg-[#F8F9FB] p-3 sm:p-4 overflow-hidden">
-        
-        {/* MEDIA COLLECTION DRAWER */}
         {showMediaFolder ? (
           <div className="flex-1 overflow-y-auto space-y-3 pr-1">
             <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
@@ -253,7 +288,6 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
             )}
           </div>
         ) : (
-          /* MESSAGES STREAM */
           <div className="flex-1 overflow-y-auto space-y-3 pr-1 mb-2">
             {messages.map((m) => (
               <div key={m.id} className={`flex flex-col ${m.isMe ? "items-end" : "items-start"}`}>
@@ -318,7 +352,6 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
           </div>
         )}
 
-        {/* Sticker Selector */}
         {showStickers && (
           <div className="p-2 mb-2 rounded-xl bg-white border border-[#E5E7EB] grid grid-cols-5 gap-1.5 text-center shadow-md">
             {STICKERS.map((s, idx) => (
@@ -333,7 +366,6 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
           </div>
         )}
 
-        {/* Hidden File Inputs */}
         <input
           type="file"
           ref={imageInputRef}
@@ -350,7 +382,6 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
           className="hidden"
         />
 
-        {/* Bottom Input Form */}
         <form onSubmit={handleSendMessage} className="pt-2 border-t border-[#E5E7EB] flex items-center gap-1.5 shrink-0">
           <button
             type="button"
@@ -396,7 +427,6 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
         </form>
       </div>
 
-      {/* Image Modal Preview */}
       {previewImage && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="relative max-w-xl w-full">
