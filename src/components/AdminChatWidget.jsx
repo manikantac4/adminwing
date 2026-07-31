@@ -4,6 +4,8 @@ import {
   Smile, Folder, FileText, Bot, Maximize2, Minimize2, ChevronLeft
 } from "lucide-react";
 
+const BACKEND_CHAT_URL = "https://turingwings-backend.onrender.com/api/chat";
+
 const INITIAL_MESSAGES = [
   {
     id: "1",
@@ -60,38 +62,49 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose, onMarkAl
   const docInputRef = useRef(null);
   const messagesEndRef = useRef(null);
 
-  // Sync state to storage
-  const syncToStorage = (newMsgs) => {
-    localStorage.setItem("adminwing_chat_messages", JSON.stringify(newMsgs));
-    window.dispatchEvent(new Event("adminwing_messages_updated"));
+  // Fetch messages from MongoDB Atlas Server (Merged across Phone & Laptop!)
+  const fetchBackendMessages = async () => {
+    try {
+      const res = await fetch(BACKEND_CHAT_URL);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          const formatted = data.map((m) => ({
+            id: m._id || m.id,
+            sender: m.sender,
+            role: m.role,
+            text: m.text,
+            sticker: m.sticker,
+            fileName: m.fileName,
+            fileSize: m.fileSize,
+            fileType: m.fileType,
+            fileData: m.fileData,
+            type: m.type,
+            isMe: m.sender === (currentUser?.name || "Pandu Ranga Tummuri"),
+            read: m.read,
+            time: m.time,
+          }));
+
+          setMessages(formatted);
+          localStorage.setItem("adminwing_chat_messages", JSON.stringify(formatted));
+
+          // Extract Media Items
+          const mediaItems = formatted.filter((m) => m.type === "image" || m.type === "document");
+          setMediaCollection(mediaItems);
+          localStorage.setItem("adminwing_media_files", JSON.stringify(mediaItems));
+        }
+      }
+    } catch {
+      // Fallback to local state if offline
+    }
   };
 
-  // CONTINUOUS LIVE SYNC (Polling every 1000ms - No Page Refresh Required!)
+  // CONTINUOUS LIVE POLLING (Every 1.5 seconds from MongoDB Atlas)
   useEffect(() => {
-    const pollInterval = setInterval(() => {
-      const savedMsgs = localStorage.getItem("adminwing_chat_messages");
-      if (savedMsgs) {
-        try {
-          const parsed = JSON.parse(savedMsgs);
-          if (JSON.stringify(parsed) !== JSON.stringify(messages)) {
-            setMessages(parsed);
-          }
-        } catch {}
-      }
-
-      const savedMedia = localStorage.getItem("adminwing_media_files");
-      if (savedMedia) {
-        try {
-          const parsedMedia = JSON.parse(savedMedia);
-          if (JSON.stringify(parsedMedia) !== JSON.stringify(mediaCollection)) {
-            setMediaCollection(parsedMedia);
-          }
-        } catch {}
-      }
-    }, 1000);
-
-    return () => clearInterval(pollInterval);
-  }, [messages, mediaCollection]);
+    fetchBackendMessages();
+    const interval = setInterval(fetchBackendMessages, 1500);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -102,19 +115,22 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose, onMarkAl
     if (isOpen) {
       setMessages((prev) => {
         const updated = prev.map((m) => ({ ...m, read: true }));
-        syncToStorage(updated);
+        localStorage.setItem("adminwing_chat_messages", JSON.stringify(updated));
         return updated;
       });
+
+      // Send read status to MongoDB Atlas server
+      fetch(`${BACKEND_CHAT_URL}/read`, { method: "POST" }).catch(() => {});
+
       if (onMarkAllRead) onMarkAllRead();
     }
   }, [isOpen]);
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e?.preventDefault();
     if (!text.trim()) return;
 
-    const newMsg = {
-      id: Date.now().toString(),
+    const payload = {
       sender: currentUser?.name || "Pandu Ranga Tummuri",
       role: "Lead Mentor",
       text: text,
@@ -124,36 +140,29 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose, onMarkAl
       read: true,
     };
 
-    const updated = [...messages, newMsg];
-    setMessages(updated);
-    syncToStorage(updated);
     setText("");
     setShowStickers(false);
 
-    // Live Auto-Reply Simulation after 2.5 seconds (Updates state & notifications live without refresh)
-    setTimeout(() => {
-      const autoReply = {
-        id: (Date.now() + 1).toString(),
-        sender: "Ratnakar Karasala",
-        role: "Cybersecurity Lead",
-        text: "Got your message! Zero-Trust security protocols and backend APIs are operating at 100% efficiency.",
-        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        type: "text",
-        isMe: false,
-        read: isOpen ? true : false,
-      };
-
-      setMessages((latest) => {
-        const nextMsgs = [...latest, autoReply];
-        syncToStorage(nextMsgs);
-        return nextMsgs;
+    try {
+      const res = await fetch(BACKEND_CHAT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
-    }, 2500);
+
+      if (res.ok) {
+        fetchBackendMessages();
+      } else {
+        throw new Error("Local fallback");
+      }
+    } catch {
+      const fallbackMsg = { id: Date.now().toString(), ...payload };
+      setMessages((prev) => [...prev, fallbackMsg]);
+    }
   };
 
-  const handleSendSticker = (sticker) => {
-    const newMsg = {
-      id: Date.now().toString(),
+  const handleSendSticker = async (sticker) => {
+    const payload = {
       sender: currentUser?.name || "Pandu Ranga Tummuri",
       role: "Lead Mentor",
       sticker: sticker,
@@ -163,47 +172,60 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose, onMarkAl
       read: true,
     };
 
-    const updated = [...messages, newMsg];
-    setMessages(updated);
-    syncToStorage(updated);
     setShowStickers(false);
+
+    try {
+      const res = await fetch(BACKEND_CHAT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        fetchBackendMessages();
+      }
+    } catch {
+      const fallbackMsg = { id: Date.now().toString(), ...payload };
+      setMessages((prev) => [...prev, fallbackMsg]);
+    }
   };
 
-  const handleFileUpload = (e, forcedType = null) => {
+  const handleFileUpload = async (e, forcedType = null) => {
     const file = e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       const fileData = event.target.result;
       const isImage = forcedType === "image" || file.type.startsWith("image/");
 
-      const mediaEntry = {
-        id: Date.now().toString(),
+      const payload = {
         sender: currentUser?.name || "Pandu Ranga Tummuri",
+        role: "Lead Mentor",
         fileName: file.name,
         fileSize: (file.size / 1024).toFixed(1) + " KB",
         fileType: file.type,
         fileData: fileData,
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         type: isImage ? "image" : "document",
-      };
-
-      const newMsg = {
-        ...mediaEntry,
-        role: "Lead Mentor",
         isMe: true,
         read: true,
       };
 
-      const updatedMsgs = [...messages, newMsg];
-      const updatedMedia = [mediaEntry, ...mediaCollection];
+      try {
+        const res = await fetch(BACKEND_CHAT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
 
-      setMessages(updatedMsgs);
-      setMediaCollection(updatedMedia);
-
-      syncToStorage(updatedMsgs);
-      localStorage.setItem("adminwing_media_files", JSON.stringify(updatedMedia));
+        if (res.ok) {
+          fetchBackendMessages();
+        }
+      } catch {
+        const fallbackMsg = { id: Date.now().toString(), ...payload };
+        setMessages((prev) => [...prev, fallbackMsg]);
+      }
     };
 
     reader.readAsDataURL(file);
@@ -241,7 +263,7 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose, onMarkAl
             </h3>
             <span className="text-[9px] sm:text-[10px] text-[#C9B27D] font-medium block mt-0.5 flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Live Continuous Sync • No Refresh Needed
+              MongoDB Atlas Merged (Phone + Laptop)
             </span>
           </div>
         </div>
