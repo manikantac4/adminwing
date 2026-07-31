@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
   MessageSquare, X, Send, Image as ImageIcon, Paperclip, Download,
-  Smile, Folder, FileText, Eye, Bot, Sparkles
+  Smile, Folder, FileText, Bot, Maximize2, Minimize2, ChevronLeft
 } from "lucide-react";
 
 const INITIAL_MESSAGES = [
@@ -37,7 +37,6 @@ const INITIAL_MESSAGES = [
 const STICKERS = ["🚀", "💻", "🛡️", "🔥", "⚡", "🥇", "🌐", "🔒", "🎉", "🧠"];
 
 export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
-  // Separate Storage Collections: Chat Messages & Media Files
   const [messages, setMessages] = useState(() => {
     const saved = localStorage.getItem("adminwing_chat_messages");
     return saved ? JSON.parse(saved) : INITIAL_MESSAGES;
@@ -51,13 +50,13 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
   const [text, setText] = useState("");
   const [showStickers, setShowStickers] = useState(false);
   const [showMediaFolder, setShowMediaFolder] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
 
   const imageInputRef = useRef(null);
   const docInputRef = useRef(null);
   const messagesEndRef = useRef(null);
 
-  // Sync to database / localStorage collections
   useEffect(() => {
     localStorage.setItem("adminwing_chat_messages", JSON.stringify(messages));
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -121,7 +120,6 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
         type: isImage ? "image" : "document",
       };
 
-      // Add to Chat Messages Collection
       const newMsg = {
         ...mediaEntry,
         role: "Lead Mentor",
@@ -129,7 +127,6 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
       };
 
       setMessages((prev) => [...prev, newMsg]);
-      // Add to Separate Media Storage Collection
       setMediaCollection((prev) => [mediaEntry, ...prev]);
     };
 
@@ -140,28 +137,43 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-full max-w-sm sm:max-w-md bg-white border border-[#E5E7EB] rounded-3xl shadow-glow overflow-hidden flex flex-col text-left font-sans">
-      
-      {/* Chatbot Top Header */}
-      <div className="bg-[#18191B] p-4 text-white flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-[#A39B89] flex items-center justify-center text-white font-bold">
-            <Bot className="w-5 h-5" />
+    <div
+      className={`fixed z-50 bg-white border border-[#E5E7EB] shadow-2xl flex flex-col text-left font-sans transition-all duration-300 ${
+        isFullscreen
+          ? "inset-0 w-full h-full rounded-none"
+          : "inset-0 sm:inset-auto sm:bottom-4 sm:right-4 sm:w-[420px] sm:h-[540px] sm:rounded-3xl w-full h-full rounded-none"
+      }`}
+    >
+      {/* Mobile & Desktop Header */}
+      <div className="bg-[#18191B] p-3.5 sm:p-4 text-white flex items-center justify-between shrink-0 shadow-md">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <button
+            onClick={onClose}
+            className="sm:hidden p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white"
+            title="Back"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#A39B89] flex items-center justify-center text-white font-bold shrink-0">
+            <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
           </div>
+
           <div>
-            <h3 className="text-sm font-bold font-poppins text-white leading-none">
-              Mentor Chatbot
+            <h3 className="text-xs sm:text-sm font-bold font-poppins text-white leading-none">
+              Mentor Chatbot Hub
             </h3>
-            <span className="text-[10px] text-[#C9B27D] font-medium block mt-0.5">
-              Live Storage Sync • Photos & Files
+            <span className="text-[9px] sm:text-[10px] text-[#C9B27D] font-medium block mt-0.5">
+              Live Media Sync • Full Screen Supported
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Media Folder Toggle */}
           <button
             onClick={() => setShowMediaFolder(!showMediaFolder)}
-            className={`p-1.5 rounded-lg border text-xs font-bold transition-all flex items-center gap-1 ${
+            className={`px-2 py-1 rounded-lg border text-xs font-bold transition-all flex items-center gap-1.5 ${
               showMediaFolder ? "bg-[#A39B89] text-white border-[#A39B89]" : "bg-slate-800 text-slate-300 border-slate-700"
             }`}
             title="Media Collection"
@@ -170,59 +182,79 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
             <span className="text-[10px] font-bold">{mediaCollection.length}</span>
           </button>
 
-          <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-white">
+          {/* Expand / Minimize Toggle */}
+          <button
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            className="hidden sm:flex p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            title={isFullscreen ? "Exit Full Screen" : "Full Screen"}
+          >
+            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+          </button>
+
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            title="Close Chat"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
       </div>
 
-      {/* Main Container */}
-      <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between bg-[#F8F9FB] min-h-[380px] max-h-[460px]">
+      {/* Main Chat & Media Container */}
+      <div className="flex-1 flex flex-col justify-between bg-[#F8F9FB] p-3 sm:p-4 overflow-hidden">
         
         {/* MEDIA COLLECTION DRAWER */}
         {showMediaFolder ? (
-          <div className="space-y-3 overflow-y-auto max-h-[360px] pr-1">
+          <div className="flex-1 overflow-y-auto space-y-3 pr-1">
             <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
               <span className="text-xs font-bold text-[#18191B]">Media Storage Collection</span>
               <span className="text-[10px] text-[#5E6168]">{mediaCollection.length} Items</span>
             </div>
 
             {mediaCollection.length === 0 ? (
-              <p className="text-xs text-[#8B9098] text-center py-8">No uploaded photos or files yet</p>
+              <div className="text-center py-12 text-[#8B9098] space-y-1">
+                <Folder className="w-8 h-8 mx-auto text-[#A39B89] opacity-40" />
+                <p className="text-xs font-bold">No uploaded media yet</p>
+                <p className="text-[10px]">Photos and files sent in chat will appear here.</p>
+              </div>
             ) : (
-              mediaCollection.map((item) => (
-                <div key={item.id} className="p-2.5 rounded-2xl bg-white border border-[#E5E7EB] space-y-2">
-                  {item.type === "image" ? (
-                    <img
-                      src={item.fileData}
-                      alt={item.fileName}
-                      className="h-24 w-full object-cover rounded-xl border border-[#E5E7EB]"
-                    />
-                  ) : (
-                    <div className="flex items-center gap-2 text-xs font-bold text-[#18191B]">
-                      <FileText className="w-4 h-4 text-[#A39B89] shrink-0" />
-                      <span className="truncate">{item.fileName}</span>
-                    </div>
-                  )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {mediaCollection.map((item) => (
+                  <div key={item.id} className="p-2.5 rounded-2xl bg-white border border-[#E5E7EB] space-y-2 shadow-sm">
+                    {item.type === "image" ? (
+                      <img
+                        src={item.fileData}
+                        alt={item.fileName}
+                        className="h-28 w-full object-cover rounded-xl border border-[#E5E7EB]"
+                      />
+                    ) : (
+                      <div className="flex items-center gap-2 text-xs font-bold text-[#18191B] p-2 bg-[#F8F9FB] rounded-xl">
+                        <FileText className="w-4 h-4 text-[#A39B89] shrink-0" />
+                        <span className="truncate">{item.fileName}</span>
+                      </div>
+                    )}
 
-                  <div className="flex items-center justify-between text-[10px] text-[#5E6168]">
-                    <span>By {item.sender}</span>
-                    <a
-                      href={item.fileData}
-                      download={item.fileName}
-                      className="px-2 py-0.5 rounded-md bg-[#18191B] hover:bg-[#A39B89] text-white font-bold flex items-center gap-1"
-                    >
-                      <Download className="w-3 h-3" />
-                      <span>Download</span>
-                    </a>
+                    <div className="flex items-center justify-between text-[10px] text-[#5E6168]">
+                      <span>By {item.sender}</span>
+                      <a
+                        href={item.fileData}
+                        download={item.fileName}
+                        className="px-2 py-1 rounded-md bg-[#18191B] hover:bg-[#A39B89] text-white font-bold flex items-center gap-1 transition-colors"
+                      >
+                        <Download className="w-3 h-3" />
+                        <span>Download</span>
+                      </a>
+                    </div>
                   </div>
-                </div>
-              ))
+                ))}
+              </div>
             )}
           </div>
         ) : (
           /* MESSAGES STREAM */
-          <div className="space-y-3 overflow-y-auto max-h-[360px] pr-1 mb-2">
+          <div className="flex-1 overflow-y-auto space-y-3 pr-1 mb-2">
             {messages.map((m) => (
               <div key={m.id} className={`flex flex-col ${m.isMe ? "items-end" : "items-start"}`}>
                 <div className="flex items-center gap-1.5 mb-0.5">
@@ -231,7 +263,7 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
                 </div>
 
                 <div
-                  className={`p-3 rounded-2xl max-w-[85%] text-xs space-y-1.5 shadow-sm ${
+                  className={`p-3 rounded-2xl max-w-[88%] sm:max-w-[80%] text-xs space-y-1.5 shadow-sm ${
                     m.isMe
                       ? "bg-[#18191B] text-white"
                       : "bg-white border border-[#E5E7EB] text-[#18191B]"
@@ -247,7 +279,7 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
                         src={m.fileData}
                         alt={m.fileName}
                         onClick={() => setPreviewImage(m.fileData)}
-                        className="max-h-40 w-full object-cover rounded-xl cursor-pointer"
+                        className="max-h-48 sm:max-h-56 w-full object-cover rounded-xl cursor-pointer hover:opacity-95 transition-opacity"
                       />
                       <div className="flex items-center justify-between text-[10px]">
                         <span className="truncate max-w-[130px] font-bold">{m.fileName}</span>
@@ -264,15 +296,15 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
                   )}
 
                   {m.type === "document" && (
-                    <div className="p-2 rounded-xl bg-[#F8F9FB] border border-[#E5E7EB] flex items-center justify-between gap-2 text-[#18191B]">
-                      <div className="flex items-center gap-1.5 overflow-hidden">
+                    <div className="p-2.5 rounded-xl bg-[#F8F9FB] border border-[#E5E7EB] flex items-center justify-between gap-2 text-[#18191B]">
+                      <div className="flex items-center gap-2 overflow-hidden">
                         <FileText className="w-4 h-4 text-[#A39B89] shrink-0" />
-                        <span className="font-bold text-[11px] truncate max-w-[120px]">{m.fileName}</span>
+                        <span className="font-bold text-[11px] truncate max-w-[130px] sm:max-w-[160px]">{m.fileName}</span>
                       </div>
                       <a
                         href={m.fileData}
                         download={m.fileName}
-                        className="px-2 py-0.5 rounded-md bg-[#18191B] text-white font-bold text-[10px] flex items-center gap-1 shrink-0"
+                        className="px-2 py-1 rounded-md bg-[#18191B] hover:bg-[#A39B89] text-white font-bold text-[10px] flex items-center gap-1 shrink-0 transition-colors"
                       >
                         <Download className="w-3 h-3" />
                         <span>Download</span>
@@ -288,12 +320,12 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
 
         {/* Sticker Selector */}
         {showStickers && (
-          <div className="p-2 mb-2 rounded-xl bg-white border border-[#E5E7EB] grid grid-cols-5 gap-1 text-center shadow-md">
+          <div className="p-2 mb-2 rounded-xl bg-white border border-[#E5E7EB] grid grid-cols-5 gap-1.5 text-center shadow-md">
             {STICKERS.map((s, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSendSticker(s)}
-                className="text-xl p-1 rounded-lg hover:bg-slate-100"
+                className="text-2xl p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
               >
                 {s}
               </button>
@@ -301,7 +333,7 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
           </div>
         )}
 
-        {/* Hidden Inputs */}
+        {/* Hidden File Inputs */}
         <input
           type="file"
           ref={imageInputRef}
@@ -318,12 +350,12 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
           className="hidden"
         />
 
-        {/* Input Form with Photo, File & Send triggers */}
-        <form onSubmit={handleSendMessage} className="pt-2 border-t border-[#E5E7EB] flex items-center gap-1">
+        {/* Bottom Input Form */}
+        <form onSubmit={handleSendMessage} className="pt-2 border-t border-[#E5E7EB] flex items-center gap-1.5 shrink-0">
           <button
             type="button"
             onClick={() => setShowStickers(!showStickers)}
-            className="p-2 rounded-xl bg-white border border-[#E5E7EB] text-[#5E6168] hover:bg-slate-100"
+            className="p-2 sm:p-2.5 rounded-xl bg-white border border-[#E5E7EB] text-[#5E6168] hover:bg-slate-100 transition-colors"
             title="Stickers"
           >
             <Smile className="w-4 h-4" />
@@ -332,7 +364,7 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
           <button
             type="button"
             onClick={() => imageInputRef.current?.click()}
-            className="p-2 rounded-xl bg-[#F8F9FB] border border-[#E5E7EB] text-[#18191B] hover:bg-[#E5E7EB]"
+            className="p-2 sm:p-2.5 rounded-xl bg-[#F8F9FB] border border-[#E5E7EB] text-[#18191B] hover:bg-[#E5E7EB] transition-colors"
             title="Attach Photo"
           >
             <ImageIcon className="w-4 h-4 text-[#A39B89]" />
@@ -341,7 +373,7 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
           <button
             type="button"
             onClick={() => docInputRef.current?.click()}
-            className="p-2 rounded-xl bg-[#F8F9FB] border border-[#E5E7EB] text-[#5E6168] hover:bg-[#E5E7EB]"
+            className="p-2 sm:p-2.5 rounded-xl bg-[#F8F9FB] border border-[#E5E7EB] text-[#5E6168] hover:bg-[#E5E7EB] transition-colors"
             title="Attach File/Document"
           >
             <Paperclip className="w-4 h-4" />
@@ -349,32 +381,32 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose }) {
 
           <input
             type="text"
-            placeholder="Ask chatbot or type..."
+            placeholder="Type a message..."
             value={text}
             onChange={(e) => setText(e.target.value)}
-            className="flex-1 px-3 py-2 rounded-xl bg-white border border-[#E5E7EB] text-xs text-[#18191B] focus:outline-none focus:border-[#A39B89]"
+            className="flex-1 px-3 py-2 sm:py-2.5 rounded-xl bg-white border border-[#E5E7EB] text-xs text-[#18191B] focus:outline-none focus:border-[#A39B89] font-medium"
           />
 
           <button
             type="submit"
-            className="p-2 sm:px-3 sm:py-2 rounded-xl bg-[#18191B] hover:bg-[#A39B89] text-white font-bold text-xs shadow-md transition-all flex items-center gap-1"
+            className="p-2 sm:px-3.5 sm:py-2.5 rounded-xl bg-[#18191B] hover:bg-[#A39B89] text-white font-bold text-xs shadow-md transition-all flex items-center gap-1"
           >
-            <Send className="w-3.5 h-3.5" />
+            <Send className="w-4 h-4" />
           </button>
         </form>
       </div>
 
-      {/* Image Preview Modal */}
+      {/* Image Modal Preview */}
       {previewImage && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="relative max-w-lg w-full">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="relative max-w-xl w-full">
             <button
               onClick={() => setPreviewImage(null)}
-              className="absolute -top-8 right-0 text-white text-xs font-bold"
+              className="absolute -top-10 right-0 px-3 py-1 bg-white/20 rounded-full text-white text-xs font-bold hover:bg-white/40"
             >
               Close ✕
             </button>
-            <img src={previewImage} alt="Preview" className="max-h-[70vh] w-full object-contain rounded-2xl" />
+            <img src={previewImage} alt="Preview" className="max-h-[75vh] w-full object-contain rounded-2xl shadow-2xl" />
           </div>
         </div>
       )}
