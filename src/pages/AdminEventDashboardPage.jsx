@@ -140,14 +140,22 @@ export default function AdminEventDashboardPage({ currentUser }) {
           </div>
 
           <div className="flex items-center gap-2">
+            <Link
+              to={`/events/edit/${eventData._id}`}
+              className="px-3.5 py-2 rounded-xl bg-[#18191B] text-white text-xs font-bold hover:bg-[#A39B89] flex items-center gap-1.5 shadow-sm"
+            >
+              <Settings className="w-3.5 h-3.5 text-[#C9B27D]" />
+              <span>Edit 20 Sections</span>
+            </Link>
+
             <a
-              href={`https://vybeai.turingwings.org/event/${eventData.slug}`}
+              href={`https://vybeai.turingwings.org/event-engine/${eventData.slug}`}
               target="_blank"
               rel="noreferrer"
               className="px-3.5 py-2 rounded-xl bg-[#F8F9FB] border border-[#E5E7EB] text-xs font-bold text-[#18191B] hover:bg-[#E5E7EB] flex items-center gap-1.5"
             >
               <Eye className="w-3.5 h-3.5 text-[#A39B89]" />
-              <span>Public Live Page</span>
+              <span>Public Standalone Site</span>
             </a>
           </div>
         </div>
