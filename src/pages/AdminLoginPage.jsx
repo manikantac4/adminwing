@@ -15,7 +15,7 @@ export default function AdminLoginPage({ setCurrentUser }) {
     setLoading(true);
 
     try {
-      const res = await fetch("https://turingwings-backend.onrender.com/api/auth/login", {
+      const res = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -25,6 +25,10 @@ export default function AdminLoginPage({ setCurrentUser }) {
 
       if (!res.ok) {
         throw new Error(data.message || "Invalid mentor credentials");
+      }
+
+      if (data.role !== "admin") {
+        throw new Error("Access Denied: Account is not a registered Lead Mentor Admin.");
       }
 
       // 3-Hour Session Persistence
@@ -37,7 +41,7 @@ export default function AdminLoginPage({ setCurrentUser }) {
       localStorage.setItem("turing_wings_user", JSON.stringify(sessionUser));
       setCurrentUser(sessionUser);
 
-      setSuccess(`Welcome Mentor ${data.name}! (3-Hour Active Session Started)`);
+      setSuccess(`Welcome Mentor ${data.name}! Authenticated successfully.`);
 
       setTimeout(() => {
         navigate("/");
@@ -62,7 +66,7 @@ export default function AdminLoginPage({ setCurrentUser }) {
             </h1>
             <span className="text-xs text-slate-600 font-mono-tech font-bold flex items-center gap-1">
               <Clock className="w-3 h-3 text-amber-600" />
-              <span>3-Hour Session Persistence</span>
+              <span>Lead Mentor Authentication Gateway</span>
             </span>
           </div>
         </div>
@@ -84,14 +88,14 @@ export default function AdminLoginPage({ setCurrentUser }) {
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block text-xs font-bold uppercase text-slate-600 mb-1">
-              Username or Email
+              Professional Username or Email
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 required
-                placeholder="ratnakar / sahith / manoj / panduranga"
+                placeholder="e.g. ratnakar.karasala / sahith.akula"
                 value={formData.usernameOrEmail}
                 onChange={(e) => setFormData({ ...formData, usernameOrEmail: e.target.value })}
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-amber-500 font-medium"
@@ -125,8 +129,14 @@ export default function AdminLoginPage({ setCurrentUser }) {
           </button>
         </form>
 
-        <div className="pt-2 text-center border-t border-slate-200 text-[11px] text-slate-500 font-mono-tech">
-          <span>Protected Lead Mentor Access — 3-Hour Session</span>
+        <div className="pt-3 border-t border-slate-200 text-[11px] text-slate-500 font-mono-tech space-y-1 text-left">
+          <span className="font-bold text-slate-700 block">Lead Mentors Access Directory:</span>
+          <ul className="list-disc pl-4 space-y-0.5 text-[10px]">
+            <li>Ratnakar Karasala — <code className="text-amber-800 font-bold">ratnakar.karasala</code></li>
+            <li>Sahith Akula — <code className="text-amber-800 font-bold">sahith.akula</code></li>
+            <li>Manoj Kumar Allu — <code className="text-amber-800 font-bold">manoj.allu</code></li>
+            <li>Pandu Ranga Tummuri — <code className="text-amber-800 font-bold">pandu.tummuri</code></li>
+          </ul>
         </div>
       </div>
     </div>
