@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ShieldCheck, MessageSquare, LogOut, LayoutDashboard, Users, Menu, X } from "lucide-react";
+import { ShieldCheck, LogOut, LayoutDashboard, Users, Menu, X, Bell, MessageSquare } from "lucide-react";
 
-export default function AdminNavbar({ currentUser }) {
+export default function AdminNavbar({ currentUser, unreadCount = 2, toggleChatbot }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showNotifs, setShowNotifs] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem("turing_wings_user");
@@ -15,33 +16,37 @@ export default function AdminNavbar({ currentUser }) {
 
   const navLinks = [
     { name: "Home", path: "/", icon: LayoutDashboard },
-    { name: "Live Chat", path: "/chat", icon: MessageSquare },
-    { name: "Admin", path: "/users", icon: Users },
+    { name: "Admin Directory", path: "/users", icon: Users },
+  ];
+
+  const notificationsList = [
+    { id: "1", title: "New Announcement Published", time: "5m ago", type: "system" },
+    { id: "2", title: "Chatbot Message from Ratnakar Karasala", time: "12m ago", type: "chat" },
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-[#e2b740]/40 py-3.5 px-4 sm:px-8 flex flex-col transition-all shadow-sm">
+    <header className="sticky top-0 z-40 bg-white border-b border-[#E5E7EB] py-3.5 px-4 sm:px-8 flex flex-col transition-all shadow-sm">
       <div className="flex items-center justify-between w-full">
         {/* Brand Title */}
         <div className="flex items-center gap-4 sm:gap-6">
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-600 flex items-center justify-center text-slate-950 font-black shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform">
-              <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5" />
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-[#18191B] to-[#A39B89] flex items-center justify-center text-white font-black shadow-md group-hover:scale-105 transition-transform">
+              <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-[#C9B27D]" />
             </div>
             <div className="text-left">
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <span className="text-base sm:text-lg font-black tracking-wider text-slate-900">
-                  ADMIN<span className="text-[#d97706]">WING</span>
+                <span className="text-base sm:text-lg font-bold tracking-wider text-[#18191B] font-poppins">
+                  ADMIN<span className="text-[#A39B89]">WING</span>
                 </span>
-                <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] font-black uppercase bg-amber-500/10 border border-amber-500/30 text-amber-900">
+                <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-[#F8F9FB] border border-[#E5E7EB] text-[#5E6168]">
                   HQ COMMAND
                 </span>
               </div>
             </div>
           </Link>
 
-          {/* Desktop Embedded Navigation Tabs */}
-          <nav className="hidden md:flex items-center gap-1.5 pl-4 border-l border-slate-200">
+          {/* Desktop Embedded Navigation Tabs (Removed Chat from bar!) */}
+          <nav className="hidden md:flex items-center gap-1.5 pl-4 border-l border-[#E5E7EB]">
             {navLinks.map((link) => {
               const Icon = link.icon;
               const isActive = location.pathname === link.path;
@@ -50,10 +55,10 @@ export default function AdminNavbar({ currentUser }) {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all ${
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                     isActive
-                      ? "bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-slate-950 shadow-md font-black"
-                      : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                      ? "bg-[#18191B] text-white font-bold shadow-md"
+                      : "text-[#5E6168] hover:bg-[#F8F9FB] hover:text-[#18191B]"
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -64,18 +69,62 @@ export default function AdminNavbar({ currentUser }) {
           </nav>
         </div>
 
-        {/* Right User Info & Sign Out */}
+        {/* Right Header Actions */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Notification Bell Button */}
+          <div className="relative">
+            <button
+              onClick={() => setShowNotifs(!showNotifs)}
+              className="p-2 rounded-xl bg-[#F8F9FB] border border-[#E5E7EB] text-[#18191B] hover:bg-[#E5E7EB] transition-colors relative"
+              title="Notifications"
+            >
+              <Bell className="w-4 h-4 text-[#18191B]" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center animate-pulse">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+
+            {/* Notification Dropdown */}
+            {showNotifs && (
+              <div className="absolute right-0 mt-2 w-72 bg-white border border-[#E5E7EB] rounded-2xl shadow-xl p-3 z-50 text-left space-y-2">
+                <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
+                  <span className="text-xs font-bold text-[#18191B]">Notifications</span>
+                  <span className="text-[10px] text-[#A39B89] font-bold">{notificationsList.length} New</span>
+                </div>
+                <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                  {notificationsList.map((n) => (
+                    <div key={n.id} className="p-2 rounded-xl bg-[#F8F9FB] text-xs space-y-0.5">
+                      <p className="font-bold text-[#18191B] text-[11px]">{n.title}</p>
+                      <span className="text-[10px] text-[#8B9098]">{n.time}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Quick Chatbot Launcher Button */}
+          <button
+            onClick={toggleChatbot}
+            className="p-2 sm:px-3 sm:py-2 rounded-xl bg-[#18191B] hover:bg-[#A39B89] text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5"
+            title="Open Chatbot Hub"
+          >
+            <MessageSquare className="w-4 h-4 text-[#C9B27D]" />
+            <span className="hidden sm:inline">Mentor Chatbot</span>
+          </button>
+
           {/* User Info Capsule */}
-          <div className="flex items-center gap-2 pl-2 sm:pl-3">
-            <div className="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-900 font-black text-xs">
+          <div className="flex items-center gap-2 pl-2 sm:pl-3 border-l border-[#E5E7EB]">
+            <div className="w-8 h-8 rounded-full bg-[#F8F9FB] border border-[#E5E7EB] flex items-center justify-center text-[#18191B] font-bold text-xs">
               {currentUser?.name ? currentUser.name.charAt(0) : "A"}
             </div>
-            <div className="text-left hidden sm:block">
-              <span className="text-xs font-bold text-slate-900 block leading-none">
+            <div className="text-left hidden lg:block">
+              <span className="text-xs font-bold text-[#18191B] block leading-none">
                 {currentUser?.name || "Lead Mentor"}
               </span>
-              <span className="text-[10px] text-amber-700 font-mono-tech font-bold">
+              <span className="text-[10px] text-[#5E6168]">
                 @{currentUser?.username || "admin"}
               </span>
             </div>
@@ -93,7 +142,7 @@ export default function AdminNavbar({ currentUser }) {
           {/* Mobile Hamburger Button */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-1.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-800"
+            className="md:hidden p-1.5 rounded-xl bg-[#F8F9FB] border border-[#E5E7EB] text-[#18191B]"
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -102,7 +151,7 @@ export default function AdminNavbar({ currentUser }) {
 
       {/* Mobile Drawer Menu */}
       {mobileOpen && (
-        <div className="md:hidden pt-3 pb-2 border-t border-slate-200 mt-2 space-y-1 text-left">
+        <div className="md:hidden pt-3 pb-2 border-t border-[#E5E7EB] mt-2 space-y-1 text-left">
           {navLinks.map((link) => {
             const Icon = link.icon;
             const isActive = location.pathname === link.path;
@@ -114,8 +163,8 @@ export default function AdminNavbar({ currentUser }) {
                 onClick={() => setMobileOpen(false)}
                 className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
                   isActive
-                    ? "bg-amber-500 text-slate-950 font-black"
-                    : "text-slate-800 hover:bg-slate-100"
+                    ? "bg-[#18191B] text-white font-bold"
+                    : "text-[#5E6168] hover:bg-[#F8F9FB]"
                 }`}
               >
                 <Icon className="w-4 h-4" />

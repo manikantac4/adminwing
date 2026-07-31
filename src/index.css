@@ -2,68 +2,72 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap');
+
 @layer base {
   body {
-    font-family: 'Outfit', sans-serif;
-    background-color: #f8f6f0;
-    color: #0f172a;
+    font-family: 'Inter', sans-serif;
+    background-color: #FFFFFF;
+    color: #18191B;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
   }
 }
 
-.font-mono-tech {
-  font-family: 'Space Grotesk', monospace;
+/* Custom Card Utility */
+.card-premium {
+  background-color: #FCFCFD;
+  border: 1px solid #E5E7EB;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
 }
 
-/* White Theme Glassmorphism Utilities */
-.glass-white {
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(226, 183, 64, 0.35);
-  box-shadow: 0 8px 32px 0 rgba(226, 183, 64, 0.08);
+.btn-primary-custom {
+  background-color: #18191B;
+  color: #FFFFFF;
+  border-radius: 12px;
+  transition: all 0.2s ease-in-out;
+}
+.btn-primary-custom:hover {
+  background-color: #A39B89;
+  color: #FFFFFF;
 }
 
-.glass-white-glow {
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(226, 183, 64, 0.45);
-  box-shadow: 0 10px 40px rgba(226, 183, 64, 0.12);
+.btn-secondary-custom {
+  background-color: #FFFFFF;
+  border: 2px solid #18191B;
+  color: #18191B;
+  border-radius: 12px;
+  transition: all 0.2s ease-in-out;
+}
+.btn-secondary-custom:hover {
+  background-color: #18191B;
+  color: #FFFFFF;
 }
 
-/* Custom Scrollbars */
+.bg-hero-gradient {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8F9FB 100%);
+}
+
+.btn-hero-gradient {
+  background: linear-gradient(135deg, #18191B 0%, #A39B89 100%);
+  color: #FFFFFF;
+}
+
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1efe9;
+  background: #F8F9FB;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(226, 183, 64, 0.4);
+  background: #A39B89;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(226, 183, 64, 0.7);
-}
-
-/* Audio Waveform Spectrum animation */
-@keyframes soundwave {
-  0%, 100% {
-    height: 6px;
-  }
-  50% {
-    height: 28px;
-  }
-}
-
-.animate-wave-1 {
-  animation: soundwave 1.2s ease-in-out infinite;
-}
-.animate-wave-2 {
-  animation: soundwave 0.9s ease-in-out infinite 0.2s;
-}
-.animate-wave-3 {
-  animation: soundwave 1.5s ease-in-out infinite 0.4s;
-}
-.animate-wave-4 {
-  animation: soundwave 0.8s ease-in-out infinite 0.1s;
+  background: #8D7A4F;
 }

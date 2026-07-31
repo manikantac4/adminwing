@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ShieldCheck, Mail, Lock, AlertCircle, CheckCircle2, Clock } from "lucide-react";
+import { ShieldCheck, Mail, Lock, AlertCircle, CheckCircle2 } from "lucide-react";
 
 export default function AdminLoginPage({ setCurrentUser }) {
   const [formData, setFormData] = useState({ usernameOrEmail: "", password: "" });
@@ -31,7 +31,6 @@ export default function AdminLoginPage({ setCurrentUser }) {
         throw new Error("Access Denied: Account is not a registered Lead Mentor Admin.");
       }
 
-      // 3-Hour Session Persistence
       const sessionUser = {
         ...data,
         expiresAt: Date.now() + 3 * 60 * 60 * 1000,
@@ -54,19 +53,18 @@ export default function AdminLoginPage({ setCurrentUser }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f6f0] text-slate-900 flex items-center justify-center p-4 selection:bg-amber-500 selection:text-slate-950">
-      <div className="w-full max-w-md glass-white-glow p-8 rounded-3xl text-left border border-amber-500/40 shadow-2xl space-y-6">
+    <div className="min-h-screen bg-hero-gradient text-[#18191B] flex items-center justify-center p-4 selection:bg-[#A39B89] selection:text-white font-sans">
+      <div className="w-full max-w-md card-premium p-8 rounded-3xl text-left border border-[#E5E7EB] shadow-glow space-y-6">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-900 font-black">
-            <ShieldCheck className="w-7 h-7 text-amber-700" />
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#18191B] to-[#A39B89] flex items-center justify-center text-white font-black shadow-md">
+            <ShieldCheck className="w-7 h-7 text-[#C9B27D]" />
           </div>
           <div>
-            <h1 className="text-2xl font-black font-serif italic text-slate-900">
-              ADMIN<span className="text-[#d97706]">WING</span>
+            <h1 className="text-2xl font-bold font-poppins text-[#18191B]">
+              ADMIN<span className="text-[#A39B89]">WING</span>
             </h1>
-            <span className="text-xs text-slate-600 font-mono-tech font-bold flex items-center gap-1">
-              <Clock className="w-3 h-3 text-amber-600" />
-              <span>Lead Mentor Authentication Gateway</span>
+            <span className="text-xs text-[#5E6168] font-mono">
+              Lead Mentor Authentication Gateway
             </span>
           </div>
         </div>
@@ -87,35 +85,35 @@ export default function AdminLoginPage({ setCurrentUser }) {
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold uppercase text-slate-600 mb-1">
-              Professional Username or Email
+            <label className="block text-xs font-bold uppercase text-[#5E6168] mb-1">
+              Username or Email
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Mail className="w-4 h-4 text-[#8B9098] absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 required
-                placeholder="e.g. ratnakar.karasala / sahith.akula"
+                placeholder="Enter username or email"
                 value={formData.usernameOrEmail}
                 onChange={(e) => setFormData({ ...formData, usernameOrEmail: e.target.value })}
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-amber-500 font-medium"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-[#E5E7EB] text-xs text-[#18191B] focus:outline-none focus:border-[#A39B89] font-medium"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase text-slate-600 mb-1">
+            <label className="block text-xs font-bold uppercase text-[#5E6168] mb-1">
               Password
             </label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Lock className="w-4 h-4 text-[#8B9098] absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="password"
                 required
                 placeholder="••••••••••••"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-amber-500 font-medium"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-[#E5E7EB] text-xs text-[#18191B] focus:outline-none focus:border-[#A39B89] font-medium"
               />
             </div>
           </div>
@@ -123,20 +121,14 @@ export default function AdminLoginPage({ setCurrentUser }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 hover:scale-[1.02] transition-all"
+            className="w-full py-3.5 btn-hero-gradient font-bold text-xs shadow-md hover:scale-[1.02] transition-all"
           >
             {loading ? "Authenticating..." : "Sign In to AdminWing"}
           </button>
         </form>
 
-        <div className="pt-3 border-t border-slate-200 text-[11px] text-slate-500 font-mono-tech space-y-1 text-left">
-          <span className="font-bold text-slate-700 block">Lead Mentors Access Directory:</span>
-          <ul className="list-disc pl-4 space-y-0.5 text-[10px]">
-            <li>Ratnakar Karasala — <code className="text-amber-800 font-bold">ratnakar.karasala</code></li>
-            <li>Sahith Akula — <code className="text-amber-800 font-bold">sahith.akula</code></li>
-            <li>Manoj Kumar Allu — <code className="text-amber-800 font-bold">manoj.allu</code></li>
-            <li>Pandu Ranga Tummuri — <code className="text-amber-800 font-bold">pandu.tummuri</code></li>
-          </ul>
+        <div className="pt-3 border-t border-[#E5E7EB] text-center text-[11px] text-[#8B9098] font-mono">
+          <span>Protected Lead Mentor Access Gateway</span>
         </div>
       </div>
     </div>
