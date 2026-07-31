@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   MessageSquare, X, Send, Image as ImageIcon, Paperclip, Download,
   Smile, Folder, FileText, Bot, Maximize2, Minimize2, ChevronLeft,
-  Camera, CheckCheck, Check, Users, Link as LinkIcon, PhoneCall, Copy,
-  CheckCircle2, Circle
+  Camera, CheckCheck, Check, Users, Circle
 } from "lucide-react";
 
 const BACKEND_CHAT_URL = "https://turingwings-backend.onrender.com/api/chat";
@@ -15,7 +14,7 @@ const EMOJI_CATEGORIES = {
   Smileys: ["😀", "😎", "🤩", "🥳", "🤖", "👨‍💻", "🙌", "💪", "✨", "🎯"],
 };
 
-export default function AdminChatWidget({ currentUser, isOpen, onClose, onMarkAllRead, onStartCall }) {
+export default function AdminChatWidget({ currentUser, isOpen, onClose, onMarkAllRead }) {
   const [messages, setMessages] = useState([]);
   const [mediaCollection, setMediaCollection] = useState([]);
   const [text, setText] = useState("");
@@ -25,7 +24,6 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose, onMarkAl
   const [showOnlineUsers, setShowOnlineUsers] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
-  const [copiedLink, setCopiedLink] = useState(false);
 
   // Real Online Mentors list from MongoDB Atlas
   const [onlineMentors, setOnlineMentors] = useState([]);
@@ -122,19 +120,6 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose, onMarkAl
       if (onMarkAllRead) onMarkAllRead();
     }
   }, [isOpen]);
-
-  const handleTriggerCall = () => {
-    // Launch Meeting Call and auto-close chat window so only the call is displayed!
-    if (onStartCall) onStartCall();
-    onClose();
-  };
-
-  const handleCopyChatLink = () => {
-    const roomUrl = `${window.location.origin}/?room=mentor-hq-call`;
-    navigator.clipboard.writeText(roomUrl);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2500);
-  };
 
   const handleOpenCamera = async () => {
     try {
@@ -333,30 +318,6 @@ export default function AdminChatWidget({ currentUser, isOpen, onClose, onMarkAl
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Launch Call & Auto-Close Chat Drawer */}
-          <button
-            onClick={handleTriggerCall}
-            className="p-1.5 px-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 transition-all shadow-md"
-            title="Start Audio/Video Meeting"
-          >
-            <PhoneCall className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Call</span>
-          </button>
-
-          {/* Copy Shareable Room Call Link */}
-          <button
-            onClick={handleCopyChatLink}
-            className="p-1.5 rounded-lg bg-slate-800 text-[#C9B27D] hover:text-white hover:bg-slate-700 transition-all flex items-center gap-1 relative"
-            title="Copy Group Call Link"
-          >
-            <LinkIcon className="w-3.5 h-3.5" />
-            {copiedLink && (
-              <span className="absolute -bottom-7 right-0 px-2 py-0.5 rounded bg-emerald-600 text-white text-[9px] font-bold whitespace-nowrap shadow-md">
-                Link Copied!
-              </span>
-            )}
-          </button>
-
           {/* Online Directory Toggle Button */}
           <button
             onClick={() => setShowOnlineUsers(!showOnlineUsers)}

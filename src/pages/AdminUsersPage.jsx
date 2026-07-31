@@ -3,7 +3,7 @@ import { Search, RefreshCw } from "lucide-react";
 import AdminNavbar from "../components/AdminNavbar";
 import AdminChatWidget from "../components/AdminChatWidget";
 
-export default function AdminUsersPage({ currentUser, onStartCall }) {
+export default function AdminUsersPage({ currentUser }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -123,7 +123,6 @@ export default function AdminUsersPage({ currentUser, onStartCall }) {
         currentUser={currentUser}
         isOpen={isChatbotOpen}
         onClose={() => setIsChatbotOpen(false)}
-        onStartCall={onStartCall}
       />
     </div>
   );
