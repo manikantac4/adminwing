@@ -1,28 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
-  PhoneCall, MessageCircle, Copy, Check, Radio, Send, Sparkles,
-  Calendar, Layers, Database, CheckCircle2, ArrowRight, ShieldCheck, Zap
+  Send, Calendar, Layers, Database, CheckCircle2, ShieldCheck, Zap
 } from "lucide-react";
 import AdminNavbar from "../components/AdminNavbar";
 
-export default function AdminDashboardPage({ currentUser, onStartCall }) {
+export default function AdminDashboardPage({ currentUser }) {
   const navigate = useNavigate();
-
-  const [copiedLink, setCopiedLink] = useState(false);
-  const defaultRoomLink = `${window.location.origin}/call/room-sentinel-01`;
-
-  const copyCallLink = () => {
-    navigator.clipboard.writeText(defaultRoomLink);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2000);
-  };
-
-  const generateWhatsAppLink = () => {
-    const message = `📞 ${currentUser?.name || "Pandu"} has started a voice call.\n\nJoin from AdminWing:\n${defaultRoomLink}\n\nThis invitation link is active now.`;
-    return `https://wa.me/919876543210?text=${encodeURIComponent(message)}`;
-  };
 
   // Form state for publishing new Cohort/Hackathon to MongoDB Atlas
   const [newEvent, setNewEvent] = useState({
@@ -92,64 +77,10 @@ export default function AdminDashboardPage({ currentUser, onStartCall }) {
 
   return (
     <div className="min-h-screen bg-[#f8f6f0] text-slate-900 selection:bg-amber-500 selection:text-slate-950 flex flex-col">
-      <AdminNavbar currentUser={currentUser} onStartCall={onStartCall} />
+      <AdminNavbar currentUser={currentUser} />
 
       <main className="max-w-7xl mx-auto w-full p-4 sm:p-8 overflow-y-auto text-left space-y-8">
         
-        {/* QUICK VOICE CALL & WHATSAPP LINK CARD */}
-        <div className="glass-white-glow p-6 sm:p-8 rounded-3xl space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <Radio className="w-4 h-4 text-emerald-600 animate-ping" />
-                <span className="text-xs font-black uppercase text-emerald-700 font-mono-tech">
-                  WEBRTC VOICE ROOM & WHATSAPP NOTIFIER
-                </span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold font-serif italic text-slate-900">
-                IN-APP VOICE CALL & WHATSAPP INVITATION LINK
-              </h2>
-            </div>
-
-            <a
-              href={generateWhatsAppLink()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-xs flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition-all shrink-0"
-            >
-              <MessageCircle className="w-4 h-4" />
-              <span>Send WhatsApp Invitation</span>
-            </a>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-white border border-[#e2b740]/40 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              <PhoneCall className="w-5 h-5 text-amber-600 shrink-0" />
-              <span className="text-xs font-mono-tech text-slate-800 font-bold truncate">
-                {defaultRoomLink}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-              <button
-                onClick={copyCallLink}
-                className="px-4 py-2 rounded-xl bg-slate-100 border border-slate-300 text-xs font-bold text-slate-800 hover:bg-slate-200 flex items-center gap-2"
-              >
-                {copiedLink ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4 text-amber-600" />}
-                <span>{copiedLink ? "Copied Link!" : "Copy Link"}</span>
-              </button>
-
-              <button
-                onClick={() => navigate("/call/room-sentinel-01")}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-slate-950 font-black text-xs hover:scale-105 transition-all flex items-center gap-1.5 shadow-md"
-              >
-                <span>Join Room</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-
         {/* MONGODB EVENT & COHORT ANNOUNCEMENT PUBLISHER */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
