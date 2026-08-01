@@ -55,6 +55,7 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
 
   const navLinks = [
     { name: "Home", path: "/", icon: LayoutDashboard },
+    { name: "Events & Hackathons", path: "/events", icon: ShieldCheck },
     { name: "Admin Directory", path: "/users", icon: Users },
   ];
 
