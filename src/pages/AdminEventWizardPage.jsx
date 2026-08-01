@@ -3,23 +3,107 @@ import { useNavigate, useParams } from "react-router-dom";
 import AdminNavbar from "../components/AdminNavbar";
 import AdminChatWidget from "../components/AdminChatWidget";
 
+const SVG_ICONS = {
+  basic: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  ),
+  branding: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+    </svg>
+  ),
+  template: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+    </svg>
+  ),
+  schedule: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    </svg>
+  ),
+  registration: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+    </svg>
+  ),
+  questions: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  ),
+  eligibility: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+    </svg>
+  ),
+  tracks: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+    </svg>
+  ),
+  rules: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+    </svg>
+  ),
+  prizes: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+    </svg>
+  ),
+  judges: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    </svg>
+  ),
+  sponsors: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+    </svg>
+  ),
+  venue: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+  ),
+  live: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+    </svg>
+  ),
+  certificates: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+    </svg>
+  ),
+  publish: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  ),
+};
+
 const STEPS = [
-  "📋 Basic Info",
-  "🎨 Branding",
-  "🖼️ Template & Theme",
-  "📅 Schedule & Timeline",
-  "📝 Registration Config",
-  "❓ Custom Questions",
-  "👥 Eligibility Rules",
-  "🚀 Tracks",
-  "⚖️ Rules & Policies",
-  "🏆 Prizes",
-  "👨‍⚖️ Judges & Mentors",
-  "🤝 Sponsors",
-  "📍 Venue & Support",
-  "📢 Live & Submissions",
-  "📜 Certificates & Emails",
-  "✅ Preview & Publish",
+  { label: "Basic Info", iconKey: "basic" },
+  { label: "Branding", iconKey: "branding" },
+  { label: "Template & Theme", iconKey: "template" },
+  { label: "Schedule & Timeline", iconKey: "schedule" },
+  { label: "Registration Config", iconKey: "registration" },
+  { label: "Custom Questions", iconKey: "questions" },
+  { label: "Eligibility Rules", iconKey: "eligibility" },
+  { label: "Tracks", iconKey: "tracks" },
+  { label: "Rules & Policies", iconKey: "rules" },
+  { label: "Prizes", iconKey: "prizes" },
+  { label: "Judges & Mentors", iconKey: "judges" },
+  { label: "Sponsors", iconKey: "sponsors" },
+  { label: "Venue & Support", iconKey: "venue" },
+  { label: "Live & Submissions", iconKey: "live" },
+  { label: "Certificates & Emails", iconKey: "certificates" },
+  { label: "Preview & Publish", iconKey: "publish" },
 ];
 
 const INITIAL_EVENT_STATE = {
@@ -276,8 +360,9 @@ export default function AdminEventWizardPage({ currentUser }) {
                 </svg>
                 Back to Events Management
               </button>
-              <h1 className="text-2xl sm:text-3xl font-bold font-poppins text-[#18191B]">
-                {id ? "✏️ Edit Event" : "🚀 Create New Event"} — 23-Phase Interactive Wizard
+              <h1 className="text-2xl sm:text-3xl font-bold font-poppins text-[#18191B] flex items-center gap-2">
+                {SVG_ICONS.publish}
+                {id ? "Edit Event" : "Create New Event"} — 23-Phase Interactive Wizard
               </h1>
               <p className="text-xs text-[#5E6168] mt-1">
                 Configure event details, tracks, schedule, prizes, judges, custom registration form, eligibility, and live settings.
@@ -317,9 +402,9 @@ export default function AdminEventWizardPage({ currentUser }) {
 
         {/* Step Progress Navigation Bar */}
         <div className="bg-white border border-[#E5E7EB] rounded-2xl p-3 overflow-x-auto flex items-center gap-2 shadow-sm scrollbar-thin">
-          {STEPS.map((stepName, idx) => (
+          {STEPS.map((step, idx) => (
             <button
-              key={stepName}
+              key={step.label}
               onClick={() => setCurrentStep(idx)}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
                 currentStep === idx
@@ -329,7 +414,10 @@ export default function AdminEventWizardPage({ currentUser }) {
                   : "bg-[#F8F9FA] text-[#5E6168] border border-[#E5E7EB] hover:bg-[#F3F4F6]"
               }`}
             >
-              <span>{stepName}</span>
+              <span className={currentStep === idx ? "text-amber-400" : "text-[#A39B89]"}>
+                {SVG_ICONS[step.iconKey]}
+              </span>
+              <span>{step.label}</span>
               {currentStep > idx && (
                 <svg className="w-3.5 h-3.5 text-[#A39B89]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
@@ -345,7 +433,10 @@ export default function AdminEventWizardPage({ currentUser }) {
           {/* STEP 0: BASIC INFORMATION */}
           {currentStep === 0 && (
             <div className="space-y-5">
-              <h2 className="text-xl font-bold text-[#18191B]">📋 Phase 1: Basic Event Information</h2>
+              <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
+                {SVG_ICONS.basic}
+                Phase 1: Basic Event Information
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-xs font-bold text-[#5E6168] mb-1">Event Name *</label>
@@ -430,7 +521,10 @@ export default function AdminEventWizardPage({ currentUser }) {
           {/* STEP 1: BRANDING */}
           {currentStep === 1 && (
             <div className="space-y-5">
-              <h2 className="text-xl font-bold text-[#18191B]">🎨 Phase 2: Branding & Media Assets</h2>
+              <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
+                {SVG_ICONS.branding}
+                Phase 2: Branding & Media Assets
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-xs font-bold text-[#5E6168] mb-1">Event Logo URL</label>
@@ -477,7 +571,10 @@ export default function AdminEventWizardPage({ currentUser }) {
           {/* STEP 2: TEMPLATE & THEME */}
           {currentStep === 2 && (
             <div className="space-y-5">
-              <h2 className="text-xl font-bold text-[#18191B]">🖼️ Phase 3: Template & Visual Design</h2>
+              <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
+                {SVG_ICONS.template}
+                Phase 3: Template & Visual Design
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-xs font-bold text-[#5E6168] mb-1">Select Event Template Module</label>
@@ -514,7 +611,10 @@ export default function AdminEventWizardPage({ currentUser }) {
           {/* STEP 3: SCHEDULE */}
           {currentStep === 3 && (
             <div className="space-y-5">
-              <h2 className="text-xl font-bold text-[#18191B]">📅 Phase 4: Event Timeline & Schedule Dates</h2>
+              <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
+                {SVG_ICONS.schedule}
+                Phase 4: Event Timeline & Schedule Dates
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div>
                   <label className="block text-xs font-bold text-[#5E6168] mb-1">Registration Opens</label>
@@ -568,7 +668,10 @@ export default function AdminEventWizardPage({ currentUser }) {
           {/* STEP 4: REGISTRATION CONFIG */}
           {currentStep === 4 && (
             <div className="space-y-5">
-              <h2 className="text-xl font-bold text-[#18191B]">📝 Phase 5: Registration & Team Settings</h2>
+              <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
+                {SVG_ICONS.registration}
+                Phase 5: Registration & Team Settings
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div>
                   <label className="block text-xs font-bold text-[#5E6168] mb-1">Registration Type</label>
@@ -609,7 +712,10 @@ export default function AdminEventWizardPage({ currentUser }) {
           {currentStep === 5 && (
             <div className="space-y-5">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-[#18191B]">❓ Phase 6: Custom Registration Questions</h2>
+                <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
+                  {SVG_ICONS.questions}
+                  Phase 6: Custom Registration Questions
+                </h2>
                 <button
                   type="button"
                   onClick={() =>
@@ -621,9 +727,12 @@ export default function AdminEventWizardPage({ currentUser }) {
                       ],
                     }))
                   }
-                  className="px-3.5 py-1.5 rounded-xl bg-[#18191B] text-white font-bold text-xs"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#18191B] text-white font-bold text-xs flex items-center gap-1"
                 >
-                  + Add Question
+                  <svg className="w-4 h-4 text-[#A39B89]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  Add Question
                 </button>
               </div>
               {formData.customQuestions?.map((q, idx) => (
@@ -654,10 +763,13 @@ export default function AdminEventWizardPage({ currentUser }) {
             </div>
           )}
 
-          {/* STEP 6: ELIGIBILITY RULES (INTERACTIVE) */}
+          {/* STEP 6: ELIGIBILITY RULES */}
           {currentStep === 6 && (
             <div className="space-y-5">
-              <h2 className="text-xl font-bold text-[#18191B]">👥 Phase 7: Eligibility Rules</h2>
+              <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
+                {SVG_ICONS.eligibility}
+                Phase 7: Eligibility Rules
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-xs font-bold text-[#5E6168] mb-1">Target Category</label>
@@ -699,7 +811,10 @@ export default function AdminEventWizardPage({ currentUser }) {
           {currentStep === 7 && (
             <div className="space-y-5">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-[#18191B]">🚀 Phase 8: Challenge Tracks</h2>
+                <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
+                  {SVG_ICONS.tracks}
+                  Phase 8: Challenge Tracks
+                </h2>
                 <button
                   type="button"
                   onClick={() =>
@@ -708,9 +823,12 @@ export default function AdminEventWizardPage({ currentUser }) {
                       tracks: [...prev.tracks, { id: Date.now().toString(), name: "", icon: "Bot", description: "" }],
                     }))
                   }
-                  className="px-3.5 py-1.5 rounded-xl bg-[#18191B] text-white font-bold text-xs"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#18191B] text-white font-bold text-xs flex items-center gap-1"
                 >
-                  + Add Track
+                  <svg className="w-4 h-4 text-[#A39B89]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  Add Track
                 </button>
               </div>
               {formData.tracks?.map((t, idx) => (
@@ -754,10 +872,13 @@ export default function AdminEventWizardPage({ currentUser }) {
             </div>
           )}
 
-          {/* STEP 8: RULES & POLICIES (INTERACTIVE) */}
+          {/* STEP 8: RULES & POLICIES */}
           {currentStep === 8 && (
             <div className="space-y-5">
-              <h2 className="text-xl font-bold text-[#18191B]">⚖️ Phase 9: Event Rules & Code of Conduct</h2>
+              <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
+                {SVG_ICONS.rules}
+                Phase 9: Event Rules & Code of Conduct
+              </h2>
               <div>
                 <label className="block text-xs font-bold text-[#5E6168] mb-1">Code of Conduct Policy</label>
                 <textarea
@@ -783,7 +904,10 @@ export default function AdminEventWizardPage({ currentUser }) {
           {currentStep === 9 && (
             <div className="space-y-5">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-[#18191B]">🏆 Phase 10: Prizes, Rewards & Benefits</h2>
+                <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
+                  {SVG_ICONS.prizes}
+                  Phase 10: Prizes, Rewards & Benefits
+                </h2>
                 <button
                   type="button"
                   onClick={() =>
@@ -792,9 +916,12 @@ export default function AdminEventWizardPage({ currentUser }) {
                       prizes: [...prev.prizes, { title: "", reward: "", category: "Track Winner", cashAmount: 1000, swag: "Swag Box" }],
                     }))
                   }
-                  className="px-3.5 py-1.5 rounded-xl bg-[#18191B] text-white font-bold text-xs"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#18191B] text-white font-bold text-xs flex items-center gap-1"
                 >
-                  + Add Prize
+                  <svg className="w-4 h-4 text-[#A39B89]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  Add Prize
                 </button>
               </div>
               {formData.prizes?.map((p, idx) => (
@@ -849,11 +976,14 @@ export default function AdminEventWizardPage({ currentUser }) {
             </div>
           )}
 
-          {/* STEP 10: JUDGES & MENTORS (INTERACTIVE) */}
+          {/* STEP 10: JUDGES & MENTORS */}
           {currentStep === 10 && (
             <div className="space-y-5">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-[#18191B]">👨‍⚖️ Phase 11: Judges & Mentors</h2>
+                <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
+                  {SVG_ICONS.judges}
+                  Phase 11: Judges & Mentors
+                </h2>
                 <button
                   type="button"
                   onClick={() =>
@@ -862,9 +992,12 @@ export default function AdminEventWizardPage({ currentUser }) {
                       judges: [...prev.judges, { id: Date.now().toString(), name: "", company: "", designation: "", bio: "", linkedin: "" }],
                     }))
                   }
-                  className="px-3.5 py-1.5 rounded-xl bg-[#18191B] text-white font-bold text-xs"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#18191B] text-white font-bold text-xs flex items-center gap-1"
                 >
-                  + Add Judge/Mentor
+                  <svg className="w-4 h-4 text-[#A39B89]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  Add Judge/Mentor
                 </button>
               </div>
               {formData.judges?.map((j, idx) => (
@@ -919,11 +1052,14 @@ export default function AdminEventWizardPage({ currentUser }) {
             </div>
           )}
 
-          {/* STEP 11: SPONSORS (INTERACTIVE) */}
+          {/* STEP 11: SPONSORS */}
           {currentStep === 11 && (
             <div className="space-y-5">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-[#18191B]">🤝 Phase 12: Sponsors & Partners</h2>
+                <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
+                  {SVG_ICONS.sponsors}
+                  Phase 12: Sponsors & Partners
+                </h2>
                 <button
                   type="button"
                   onClick={() =>
@@ -932,9 +1068,12 @@ export default function AdminEventWizardPage({ currentUser }) {
                       sponsors: [...prev.sponsors, { id: Date.now().toString(), name: "", logo: "", website: "", tier: "Gold" }],
                     }))
                   }
-                  className="px-3.5 py-1.5 rounded-xl bg-[#18191B] text-white font-bold text-xs"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#18191B] text-white font-bold text-xs flex items-center gap-1"
                 >
-                  + Add Sponsor
+                  <svg className="w-4 h-4 text-[#A39B89]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  Add Sponsor
                 </button>
               </div>
               {formData.sponsors?.map((s, idx) => (
@@ -992,10 +1131,13 @@ export default function AdminEventWizardPage({ currentUser }) {
             </div>
           )}
 
-          {/* STEP 12: VENUE & SUPPORT (INTERACTIVE) */}
+          {/* STEP 12: VENUE & SUPPORT */}
           {currentStep === 12 && (
             <div className="space-y-5">
-              <h2 className="text-xl font-bold text-[#18191B]">📍 Phase 13: Venue & Support Contacts</h2>
+              <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
+                {SVG_ICONS.venue}
+                Phase 13: Venue & Support Contacts
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div>
                   <label className="block text-xs font-bold text-[#5E6168] mb-1">Coordinator Name</label>
@@ -1028,10 +1170,13 @@ export default function AdminEventWizardPage({ currentUser }) {
             </div>
           )}
 
-          {/* STEP 13: LIVE SETTINGS (INTERACTIVE) */}
+          {/* STEP 13: LIVE SETTINGS */}
           {currentStep === 13 && (
             <div className="space-y-5">
-              <h2 className="text-xl font-bold text-[#18191B]">📢 Phase 14: Live Event Features</h2>
+              <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
+                {SVG_ICONS.live}
+                Phase 14: Live Event Features
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <label className="flex items-center gap-3 p-4 rounded-2xl bg-[#F8F9FA] border border-[#E5E7EB] cursor-pointer">
                   <input
@@ -1058,9 +1203,9 @@ export default function AdminEventWizardPage({ currentUser }) {
           {/* STEP 15: PREVIEW & PUBLISH */}
           {currentStep === 15 && (
             <div className="space-y-6 text-center py-6">
-              <svg className="w-12 h-12 text-[#A39B89] mx-auto animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-              </svg>
+              <div className="w-12 h-12 text-[#A39B89] mx-auto animate-pulse">
+                {SVG_ICONS.publish}
+              </div>
               <h2 className="text-2xl font-extrabold text-[#18191B]">Event Creation Ready!</h2>
               <p className="text-sm text-[#5E6168] max-w-lg mx-auto">
                 Review event configuration for <span className="text-[#A39B89] font-bold">{formData.name || "Untitled Event"}</span>. Click publish to deploy to Turing Wings platform.
