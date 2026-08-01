@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  Calendar, Check, ChevronLeft, ChevronRight, Plus, Trash2, Trophy,
-  Users, Award, Sparkles, Layers, Shield, HelpCircle, Mail, MapPin,
-  Eye, Save, Send, Image as ImageIcon, Video, Code, FileText, CheckCircle2
-} from "lucide-react";
 import AdminNavbar from "../components/AdminNavbar";
+import AdminChatWidget from "../components/AdminChatWidget";
 
 const STEPS = [
   "📋 Basic Info",
@@ -167,6 +163,7 @@ export default function AdminEventWizardPage({ currentUser }) {
   const [loading, setLoading] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [formData, setFormData] = useState(INITIAL_EVENT_STATE);
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
 
   const API_URL = "https://turingwings-backend.onrender.com/api/events";
 
@@ -223,7 +220,6 @@ export default function AdminEventWizardPage({ currentUser }) {
       });
 
       if (res.ok) {
-        const saved = await res.json();
         setSaveMessage(`✅ Event ${statusOverride === "Published" ? "Published" : "Saved"} Successfully!`);
         setTimeout(() => {
           navigate("/events");
@@ -241,84 +237,103 @@ export default function AdminEventWizardPage({ currentUser }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
-      <AdminNavbar currentUser={currentUser} unreadCount={2} />
+    <div className="min-h-screen bg-hero-gradient text-[#18191B] selection:bg-[#A39B89] selection:text-white flex flex-col font-sans">
+      <AdminNavbar
+        currentUser={currentUser}
+        unreadCount={2}
+        toggleChatbot={() => setIsChatbotOpen(!isChatbotOpen)}
+      />
 
-      <main className="max-w-7xl mx-auto w-full p-4 sm:p-8 flex-1 flex flex-col gap-6 text-left">
+      <main className="max-w-7xl mx-auto w-full p-4 sm:p-8 overflow-y-auto text-left space-y-8 flex-1">
         {/* Header Strip */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
-          <div>
-            <button
-              onClick={() => navigate("/events")}
-              className="inline-flex items-center gap-1 text-xs text-amber-400 font-bold hover:underline mb-1"
-            >
-              <ChevronLeft className="w-4 h-4" /> Back to Events Management
-            </button>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
-              {id ? "✏️ Edit Event" : "🚀 Create New Event"} — 23-Phase Event Builder
-            </h1>
-            <p className="text-xs text-slate-400">
-              Configure event details, tracks, schedule, prizes, judges, custom registration form, and live settings.
-            </p>
-          </div>
+        <div className="card-premium p-6 sm:p-8 space-y-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <button
+                onClick={() => navigate("/events")}
+                className="inline-flex items-center gap-1 text-xs text-[#A39B89] font-bold hover:underline mb-1"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to Events Management
+              </button>
+              <h1 className="text-2xl sm:text-3xl font-bold font-poppins text-[#18191B]">
+                {id ? "✏️ Edit Event" : "🚀 Create New Event"} — Multi-Phase Builder
+              </h1>
+              <p className="text-xs text-[#5E6168] mt-1">
+                Configure event details, tracks, schedule, prizes, judges, custom registration form, and live settings.
+              </p>
+            </div>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => handleSave("Draft")}
-              disabled={loading}
-              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center gap-2 border border-slate-700"
-            >
-              <Save className="w-4 h-4 text-amber-400" /> Save Draft
-            </button>
-            <button
-              onClick={() => handleSave("Published")}
-              disabled={loading}
-              className="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-extrabold text-xs flex items-center gap-2 shadow-lg shadow-amber-500/20"
-            >
-              <Send className="w-4 h-4" /> Publish Event
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => handleSave("Draft")}
+                disabled={loading}
+                className="px-4 py-2 rounded-xl bg-white hover:bg-[#F3F4F6] text-[#18191B] font-bold text-xs flex items-center gap-2 border border-[#E5E7EB] shadow-sm transition-all"
+              >
+                <svg className="w-4 h-4 text-[#A39B89]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                </svg>
+                Save Draft
+              </button>
+              <button
+                onClick={() => handleSave("Published")}
+                disabled={loading}
+                className="px-5 py-2 rounded-xl bg-[#18191B] hover:bg-[#2A2C30] text-white font-extrabold text-xs flex items-center gap-2 shadow-md transition-all"
+              >
+                <svg className="w-4 h-4 text-[#A39B89]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+                Publish Event
+              </button>
+            </div>
           </div>
         </div>
 
         {saveMessage && (
-          <div className="p-3 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold">
+          <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold shadow-sm">
             {saveMessage}
           </div>
         )}
 
         {/* Step Progress Navigation Bar */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 overflow-x-auto flex items-center gap-2 scrollbar-thin">
+        <div className="bg-white border border-[#E5E7EB] rounded-2xl p-3 overflow-x-auto flex items-center gap-2 shadow-sm scrollbar-thin">
           {STEPS.map((stepName, idx) => (
             <button
               key={stepName}
               onClick={() => setCurrentStep(idx)}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
                 currentStep === idx
-                  ? "bg-amber-500 text-slate-950 shadow-md font-extrabold"
+                  ? "bg-[#18191B] text-white shadow-md font-extrabold"
                   : currentStep > idx
-                  ? "bg-slate-800 text-amber-400 border border-amber-500/20"
-                  : "bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-900"
+                  ? "bg-[#FAF8F5] text-[#A39B89] border border-[#D4CEB8]"
+                  : "bg-[#F8F9FA] text-[#5E6168] border border-[#E5E7EB] hover:bg-[#F3F4F6]"
               }`}
             >
               <span>{stepName}</span>
-              {currentStep > idx && <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" />}
+              {currentStep > idx && (
+                <svg className="w-3.5 h-3.5 text-[#A39B89]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                </svg>
+              )}
             </button>
           ))}
         </div>
 
         {/* Step Content Container */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 flex-1 shadow-2xl">
+        <div className="bg-white border border-[#E5E7EB] rounded-3xl p-6 sm:p-8 space-y-6 flex-1 shadow-sm">
           
           {/* STEP 0: BASIC INFORMATION */}
           {currentStep === 0 && (
             <div className="space-y-5">
-              <h2 className="text-xl font-bold text-amber-400 flex items-center gap-2">
+              <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
                 📋 Phase 1: Basic Event Information
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Event Name *</label>
+                  <label className="block text-xs font-bold text-[#5E6168] mb-1">Event Name *</label>
                   <input
                     type="text"
                     value={formData.name}
@@ -329,38 +344,38 @@ export default function AdminEventWizardPage({ currentUser }) {
                       }
                     }}
                     placeholder="e.g. Turing Wings AI Buildathon 2026"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Short Name</label>
+                  <label className="block text-xs font-bold text-[#5E6168] mb-1">Short Name</label>
                   <input
                     type="text"
                     value={formData.shortName}
                     onChange={(e) => handleInputChange("shortName", e.target.value)}
                     placeholder="e.g. TW-Buildathon-26"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Event Slug (Auto-Generated URL)</label>
+                  <label className="block text-xs font-bold text-[#5E6168] mb-1">Event Slug (Auto-Generated URL)</label>
                   <input
                     type="text"
                     value={formData.slug}
                     onChange={(e) => handleInputChange("slug", e.target.value)}
                     placeholder="e.g. tw-buildathon-2026"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none font-mono"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none font-mono"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Event Type</label>
+                  <label className="block text-xs font-bold text-[#5E6168] mb-1">Event Type</label>
                   <select
                     value={formData.type}
                     onChange={(e) => handleInputChange("type", e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none"
                   >
                     <option value="Hackathon">Hackathon</option>
                     <option value="Ideathon">Ideathon</option>
@@ -374,35 +389,35 @@ export default function AdminEventWizardPage({ currentUser }) {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Tagline</label>
+                <label className="block text-xs font-bold text-[#5E6168] mb-1">Tagline</label>
                 <input
                   type="text"
                   value={formData.tagline}
                   onChange={(e) => handleInputChange("tagline", e.target.value)}
                   placeholder="e.g. Build Next-Gen AI Applications & Spatial UI Systems in 48 Hours"
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Short Description</label>
+                <label className="block text-xs font-bold text-[#5E6168] mb-1">Short Description</label>
                 <textarea
                   rows={2}
                   value={formData.shortDescription}
                   onChange={(e) => handleInputChange("shortDescription", e.target.value)}
                   placeholder="Concise overview for event cards and social sharing..."
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Full Description & Vision</label>
+                <label className="block text-xs font-bold text-[#5E6168] mb-1">Full Description & Vision</label>
                 <textarea
                   rows={4}
                   value={formData.fullDescription}
                   onChange={(e) => handleInputChange("fullDescription", e.target.value)}
                   placeholder="Detailed breakdown of event objectives, problem statements, and vision..."
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none"
                 />
               </div>
             </div>
@@ -411,52 +426,52 @@ export default function AdminEventWizardPage({ currentUser }) {
           {/* STEP 1: BRANDING */}
           {currentStep === 1 && (
             <div className="space-y-5">
-              <h2 className="text-xl font-bold text-amber-400 flex items-center gap-2">
+              <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
                 🎨 Phase 2: Branding & Media Assets
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Event Logo URL</label>
+                  <label className="block text-xs font-bold text-[#5E6168] mb-1">Event Logo URL</label>
                   <input
                     type="text"
                     value={formData.logo}
                     onChange={(e) => handleInputChange("logo", e.target.value)}
                     placeholder="https://... logo image link"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Hero Banner Image URL</label>
+                  <label className="block text-xs font-bold text-[#5E6168] mb-1">Hero Banner Image URL</label>
                   <input
                     type="text"
                     value={formData.heroBanner}
                     onChange={(e) => handleInputChange("heroBanner", e.target.value)}
                     placeholder="https://... banner image link"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Thumbnail Card Image URL</label>
+                  <label className="block text-xs font-bold text-[#5E6168] mb-1">Thumbnail Card Image URL</label>
                   <input
                     type="text"
                     value={formData.thumbnail}
                     onChange={(e) => handleInputChange("thumbnail", e.target.value)}
                     placeholder="https://... thumbnail image link"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Intro / Promo Video URL</label>
+                  <label className="block text-xs font-bold text-[#5E6168] mb-1">Intro / Promo Video URL</label>
                   <input
                     type="text"
                     value={formData.introVideo}
                     onChange={(e) => handleInputChange("introVideo", e.target.value)}
                     placeholder="https://youtube.com/... or mp4 link"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none"
                   />
                 </div>
               </div>
@@ -466,17 +481,17 @@ export default function AdminEventWizardPage({ currentUser }) {
           {/* STEP 2: TEMPLATE & THEME */}
           {currentStep === 2 && (
             <div className="space-y-5">
-              <h2 className="text-xl font-bold text-amber-400 flex items-center gap-2">
+              <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
                 🖼️ Phase 3: Template & Visual Design
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Select Event Template Module</label>
+                  <label className="block text-xs font-bold text-[#5E6168] mb-1">Select Event Template Module</label>
                   <select
                     value={formData.templateId}
                     onChange={(e) => handleInputChange("templateId", e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none"
                   >
                     <option value="ai-future">AI Future (Gold & Glassmorphism)</option>
                     <option value="cyberpunk">Cyberpunk Neon</option>
@@ -488,11 +503,11 @@ export default function AdminEventWizardPage({ currentUser }) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Background Overlay Style</label>
+                  <label className="block text-xs font-bold text-[#5E6168] mb-1">Background Overlay Style</label>
                   <select
                     value={formData.backgroundStyle}
                     onChange={(e) => handleInputChange("backgroundStyle", e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none"
                   >
                     <option value="particles">Interactive Floating Particles</option>
                     <option value="gradient">Animated Soft Gradient</option>
@@ -507,58 +522,58 @@ export default function AdminEventWizardPage({ currentUser }) {
           {/* STEP 3: SCHEDULE */}
           {currentStep === 3 && (
             <div className="space-y-5">
-              <h2 className="text-xl font-bold text-amber-400 flex items-center gap-2">
+              <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
                 📅 Phase 4: Event Timeline & Schedule Dates
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Registration Opens</label>
+                  <label className="block text-xs font-bold text-[#5E6168] mb-1">Registration Opens</label>
                   <input
                     type="date"
                     value={formData.schedule?.registrationOpen ? formData.schedule.registrationOpen.slice(0, 10) : ""}
                     onChange={(e) => handleNestedChange("schedule", "registrationOpen", e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Registration Closes</label>
+                  <label className="block text-xs font-bold text-[#5E6168] mb-1">Registration Closes</label>
                   <input
                     type="date"
                     value={formData.schedule?.registrationClose ? formData.schedule.registrationClose.slice(0, 10) : ""}
                     onChange={(e) => handleNestedChange("schedule", "registrationClose", e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Event Start Date</label>
+                  <label className="block text-xs font-bold text-[#5E6168] mb-1">Event Start Date</label>
                   <input
                     type="date"
                     value={formData.schedule?.eventStart ? formData.schedule.eventStart.slice(0, 10) : ""}
                     onChange={(e) => handleNestedChange("schedule", "eventStart", e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Submission Deadline</label>
+                  <label className="block text-xs font-bold text-[#5E6168] mb-1">Submission Deadline</label>
                   <input
                     type="date"
                     value={formData.schedule?.submissionDeadline ? formData.schedule.submissionDeadline.slice(0, 10) : ""}
                     onChange={(e) => handleNestedChange("schedule", "submissionDeadline", e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Winners Announcement Date</label>
+                  <label className="block text-xs font-bold text-[#5E6168] mb-1">Winners Announcement Date</label>
                   <input
                     type="date"
                     value={formData.schedule?.winnerAnnouncementDate ? formData.schedule.winnerAnnouncementDate.slice(0, 10) : ""}
                     onChange={(e) => handleNestedChange("schedule", "winnerAnnouncementDate", e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none"
                   />
                 </div>
               </div>
@@ -568,17 +583,17 @@ export default function AdminEventWizardPage({ currentUser }) {
           {/* STEP 4: REGISTRATION CONFIG */}
           {currentStep === 4 && (
             <div className="space-y-5">
-              <h2 className="text-xl font-bold text-amber-400 flex items-center gap-2">
+              <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
                 📝 Phase 5: Registration & Team Settings
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Registration Type</label>
+                  <label className="block text-xs font-bold text-[#5E6168] mb-1">Registration Type</label>
                   <select
                     value={formData.registrationConfig?.registrationType}
                     onChange={(e) => handleNestedChange("registrationConfig", "registrationType", e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none"
                   >
                     <option value="Individual">Individual Only</option>
                     <option value="Team">Team (1-4 Members)</option>
@@ -586,21 +601,21 @@ export default function AdminEventWizardPage({ currentUser }) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Max Team Size</label>
+                  <label className="block text-xs font-bold text-[#5E6168] mb-1">Max Team Size</label>
                   <input
                     type="number"
                     value={formData.registrationConfig?.maxTeamSize}
                     onChange={(e) => handleNestedChange("registrationConfig", "maxTeamSize", parseInt(e.target.value) || 4)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Approval Type</label>
+                  <label className="block text-xs font-bold text-[#5E6168] mb-1">Approval Type</label>
                   <select
                     value={formData.registrationConfig?.approvalType}
                     onChange={(e) => handleNestedChange("registrationConfig", "approvalType", e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:border-amber-500 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] focus:border-[#A39B89] outline-none"
                   >
                     <option value="Auto">Auto-Approve Instant</option>
                     <option value="Manual">Manual Admin Review</option>
@@ -614,7 +629,7 @@ export default function AdminEventWizardPage({ currentUser }) {
           {currentStep === 5 && (
             <div className="space-y-5">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-amber-400 flex items-center gap-2">
+                <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
                   ❓ Phase 6: Custom Registration Questions
                 </h2>
                 <button
@@ -628,14 +643,17 @@ export default function AdminEventWizardPage({ currentUser }) {
                       ],
                     }))
                   }
-                  className="px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs flex items-center gap-1"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#18191B] text-white font-bold text-xs flex items-center gap-1"
                 >
-                  <Plus className="w-4 h-4" /> Add Question
+                  <svg className="w-4 h-4 text-[#A39B89]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  Add Question
                 </button>
               </div>
 
               {formData.customQuestions?.map((q, idx) => (
-                <div key={q.id || idx} className="p-4 rounded-2xl bg-slate-950 border border-slate-800 flex items-center gap-4">
+                <div key={q.id || idx} className="p-4 rounded-2xl bg-[#F8F9FA] border border-[#E5E7EB] flex items-center gap-4">
                   <div className="flex-1 space-y-2">
                     <input
                       type="text"
@@ -646,7 +664,7 @@ export default function AdminEventWizardPage({ currentUser }) {
                         setFormData((prev) => ({ ...prev, customQuestions: updated }));
                       }}
                       placeholder={`Question ${idx + 1}...`}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white outline-none"
+                      className="w-full px-3.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-sm text-[#18191B] outline-none"
                     />
                   </div>
                   <button
@@ -655,9 +673,11 @@ export default function AdminEventWizardPage({ currentUser }) {
                       const updated = formData.customQuestions.filter((_, i) => i !== idx);
                       setFormData((prev) => ({ ...prev, customQuestions: updated }));
                     }}
-                    className="p-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                    className="p-2 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
                   </button>
                 </div>
               ))}
@@ -668,7 +688,7 @@ export default function AdminEventWizardPage({ currentUser }) {
           {currentStep === 7 && (
             <div className="space-y-5">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-amber-400 flex items-center gap-2">
+                <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
                   🚀 Phase 8: Challenge Tracks
                 </h2>
                 <button
@@ -682,14 +702,17 @@ export default function AdminEventWizardPage({ currentUser }) {
                       ],
                     }))
                   }
-                  className="px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs flex items-center gap-1"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#18191B] text-white font-bold text-xs flex items-center gap-1"
                 >
-                  <Plus className="w-4 h-4" /> Add Track
+                  <svg className="w-4 h-4 text-[#A39B89]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  Add Track
                 </button>
               </div>
 
               {formData.tracks?.map((t, idx) => (
-                <div key={t.id || idx} className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+                <div key={t.id || idx} className="p-4 rounded-2xl bg-[#F8F9FA] border border-[#E5E7EB] space-y-3">
                   <div className="flex items-center justify-between gap-3">
                     <input
                       type="text"
@@ -700,7 +723,7 @@ export default function AdminEventWizardPage({ currentUser }) {
                         setFormData((prev) => ({ ...prev, tracks: updated }));
                       }}
                       placeholder="Track Title (e.g. AI Agent Swarms)"
-                      className="flex-1 px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white font-bold outline-none"
+                      className="flex-1 px-3.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-sm text-[#18191B] font-bold outline-none"
                     />
                     <button
                       type="button"
@@ -708,9 +731,11 @@ export default function AdminEventWizardPage({ currentUser }) {
                         const updated = formData.tracks.filter((_, i) => i !== idx);
                         setFormData((prev) => ({ ...prev, tracks: updated }));
                       }}
-                      className="p-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                      className="p-2 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
                     </button>
                   </div>
                   <textarea
@@ -722,7 +747,7 @@ export default function AdminEventWizardPage({ currentUser }) {
                       setFormData((prev) => ({ ...prev, tracks: updated }));
                     }}
                     placeholder="Track objectives and problem statement brief..."
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white outline-none"
+                    className="w-full px-3.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-xs text-[#18191B] outline-none"
                   />
                 </div>
               ))}
@@ -733,7 +758,7 @@ export default function AdminEventWizardPage({ currentUser }) {
           {currentStep === 9 && (
             <div className="space-y-5">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-amber-400 flex items-center gap-2">
+                <h2 className="text-xl font-bold text-[#18191B] flex items-center gap-2">
                   🏆 Phase 10: Prizes, Rewards & Benefits
                 </h2>
                 <button
@@ -747,14 +772,17 @@ export default function AdminEventWizardPage({ currentUser }) {
                       ],
                     }))
                   }
-                  className="px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs flex items-center gap-1"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#18191B] text-white font-bold text-xs flex items-center gap-1"
                 >
-                  <Plus className="w-4 h-4" /> Add Prize
+                  <svg className="w-4 h-4 text-[#A39B89]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  Add Prize
                 </button>
               </div>
 
               {formData.prizes?.map((p, idx) => (
-                <div key={idx} className="p-4 rounded-2xl bg-slate-950 border border-slate-800 grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div key={idx} className="p-4 rounded-2xl bg-[#F8F9FA] border border-[#E5E7EB] grid grid-cols-1 md:grid-cols-3 gap-3">
                   <input
                     type="text"
                     value={p.title}
@@ -764,7 +792,7 @@ export default function AdminEventWizardPage({ currentUser }) {
                       setFormData((prev) => ({ ...prev, prizes: updated }));
                     }}
                     placeholder="Prize Title (e.g. Grand Champion)"
-                    className="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white font-bold outline-none"
+                    className="px-3.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-sm text-[#18191B] font-bold outline-none"
                   />
                   <input
                     type="text"
@@ -775,7 +803,7 @@ export default function AdminEventWizardPage({ currentUser }) {
                       setFormData((prev) => ({ ...prev, prizes: updated }));
                     }}
                     placeholder="Reward Description ($5,000 Cash + Swag)"
-                    className="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white outline-none"
+                    className="px-3.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-sm text-[#18191B] outline-none"
                   />
                   <div className="flex items-center gap-2">
                     <input
@@ -787,7 +815,7 @@ export default function AdminEventWizardPage({ currentUser }) {
                         setFormData((prev) => ({ ...prev, prizes: updated }));
                       }}
                       placeholder="Cash Amount $"
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white outline-none"
+                      className="w-full px-3.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-sm text-[#18191B] outline-none"
                     />
                     <button
                       type="button"
@@ -795,9 +823,11 @@ export default function AdminEventWizardPage({ currentUser }) {
                         const updated = formData.prizes.filter((_, i) => i !== idx);
                         setFormData((prev) => ({ ...prev, prizes: updated }));
                       }}
-                      className="p-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                      className="p-2 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
                     </button>
                   </div>
                 </div>
@@ -808,24 +838,26 @@ export default function AdminEventWizardPage({ currentUser }) {
           {/* STEP 15: PREVIEW & PUBLISH */}
           {currentStep === 15 && (
             <div className="space-y-6 text-center py-6">
-              <Sparkles className="w-12 h-12 text-amber-400 mx-auto animate-pulse" />
-              <h2 className="text-2xl font-extrabold text-white">Event Creation Ready!</h2>
-              <p className="text-sm text-slate-300 max-w-lg mx-auto">
-                Review event configuration for <span className="text-amber-400 font-bold">{formData.name || "Untitled Event"}</span>. Click publish to deploy to Turing Wings platform.
+              <svg className="w-12 h-12 text-[#A39B89] mx-auto animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+              <h2 className="text-2xl font-extrabold text-[#18191B]">Event Creation Ready!</h2>
+              <p className="text-sm text-[#5E6168] max-w-lg mx-auto">
+                Review event configuration for <span className="text-[#A39B89] font-bold">{formData.name || "Untitled Event"}</span>. Click publish to deploy to Turing Wings platform.
               </p>
 
               <div className="flex items-center justify-center gap-4 pt-4">
                 <button
                   onClick={() => handleSave("Draft")}
                   disabled={loading}
-                  className="px-6 py-3 rounded-2xl bg-slate-800 text-slate-200 font-bold text-sm border border-slate-700 hover:bg-slate-700"
+                  className="px-6 py-3 rounded-2xl bg-white text-[#18191B] font-bold text-sm border border-[#E5E7EB] hover:bg-[#F3F4F6] shadow-sm"
                 >
                   Save as Draft
                 </button>
                 <button
                   onClick={() => handleSave("Published")}
                   disabled={loading}
-                  className="px-8 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-extrabold text-sm shadow-xl shadow-amber-500/25 hover:scale-105 transition-all"
+                  className="px-8 py-3 rounded-2xl bg-[#18191B] text-white font-extrabold text-sm shadow-xl hover:bg-[#2A2C30] transition-all"
                 >
                   🚀 Publish Live Event Now
                 </button>
@@ -834,30 +866,43 @@ export default function AdminEventWizardPage({ currentUser }) {
           )}
 
           {/* Bottom Wizard Stepper Navigation Buttons */}
-          <div className="flex items-center justify-between border-t border-slate-800 pt-6 mt-6">
+          <div className="flex items-center justify-between border-t border-[#F3F4F6] pt-6 mt-6">
             <button
               disabled={currentStep === 0}
               onClick={() => setCurrentStep((prev) => Math.max(0, prev - 1))}
-              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs disabled:opacity-40 flex items-center gap-1"
+              className="px-4 py-2 rounded-xl bg-[#F8F9FA] hover:bg-[#F3F4F6] text-[#18191B] font-bold text-xs disabled:opacity-40 flex items-center gap-1 border border-[#E5E7EB]"
             >
-              <ChevronLeft className="w-4 h-4" /> Previous Phase
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+              </svg>
+              Previous Phase
             </button>
 
-            <span className="text-xs text-slate-400 font-mono">
+            <span className="text-xs text-[#5E6168] font-mono">
               Phase {currentStep + 1} of {STEPS.length}
             </span>
 
             <button
               disabled={currentStep === STEPS.length - 1}
               onClick={() => setCurrentStep((prev) => Math.min(STEPS.length - 1, prev + 1))}
-              className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs flex items-center gap-1 shadow-md"
+              className="px-5 py-2 rounded-xl bg-[#18191B] hover:bg-[#2A2C30] text-white font-extrabold text-xs flex items-center gap-1 shadow-sm"
             >
-              Next Phase <ChevronRight className="w-4 h-4" />
+              Next Phase
+              <svg className="w-4 h-4 text-[#A39B89]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+              </svg>
             </button>
           </div>
 
         </div>
       </main>
+
+      {/* FLOATING INTERACTIVE CHATBOT WIDGET */}
+      <AdminChatWidget
+        currentUser={currentUser}
+        isOpen={isChatbotOpen}
+        onClose={() => setIsChatbotOpen(false)}
+      />
     </div>
   );
 }
