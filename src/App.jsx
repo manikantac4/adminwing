@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
+import AdminEventsPage from "./pages/AdminEventsPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 
 function ProtectedRoute({ currentUser, children }) {
@@ -40,6 +41,14 @@ function AppContent() {
         element={
           <ProtectedRoute currentUser={currentUser}>
             <AdminDashboardPage currentUser={currentUser} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/events"
+        element={
+          <ProtectedRoute currentUser={currentUser}>
+            <AdminEventsPage currentUser={currentUser} />
           </ProtectedRoute>
         }
       />
