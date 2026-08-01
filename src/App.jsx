@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
-import AdminEventDashboardPage from "./pages/AdminEventDashboardPage";
-import AdminEventEditorPage from "./pages/AdminEventEditorPage";
-import AdminChatPage from "./pages/AdminChatPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 
@@ -47,30 +44,6 @@ function AppContent() {
         }
       />
       <Route
-        path="/events/:id"
-        element={
-          <ProtectedRoute currentUser={currentUser}>
-            <AdminEventDashboardPage currentUser={currentUser} />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/events/edit/:id"
-        element={
-          <ProtectedRoute currentUser={currentUser}>
-            <AdminEventEditorPage currentUser={currentUser} />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/chat"
-        element={
-          <ProtectedRoute currentUser={currentUser}>
-            <AdminChatPage currentUser={currentUser} />
-          </ProtectedRoute>
-        }
-      />
-      <Route
         path="/users"
         element={
           <ProtectedRoute currentUser={currentUser}>
@@ -82,6 +55,7 @@ function AppContent() {
         path="/login"
         element={<AdminLoginPage setCurrentUser={setCurrentUser} />}
       />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
