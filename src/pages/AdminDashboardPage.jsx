@@ -49,10 +49,10 @@ export default function AdminDashboardPage({ currentUser }) {
                 </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold font-mono text-[#111]">
-                Mentor Control Gateway & Hackathon Manager
+                Cohort Command Center & Buildathon Manager
               </h1>
               <p className="text-xs text-black/60 mt-1">
-                Manage live hackathons, buildathons, real-time registrations, and mentor communications.
+                Launch new flagship cohorts, edit active buildathons, manage student registrations, and direct live engineering modules.
               </p>
             </div>
 
@@ -64,7 +64,7 @@ export default function AdminDashboardPage({ currentUser }) {
                 <svg className="w-4 h-4 text-[#22C55E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                 </svg>
-                <span>Launch New Event Wizard</span>
+                <span>Launch Cohort / Buildathon 🚀</span>
               </Link>
               <button
                 onClick={() => setIsChatbotOpen(!isChatbotOpen)}

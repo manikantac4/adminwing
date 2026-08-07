@@ -339,7 +339,7 @@ export default function AdminEventWizardPage({ currentUser }) {
   };
 
   return (
-    <div className="min-h-screen bg-hero-gradient text-[#18191B] selection:bg-[#A39B89] selection:text-white flex flex-col font-sans">
+    <div className="min-h-screen bg-[#FAFAFA] text-[#090909] selection:bg-[#22C55E] selection:text-black flex flex-col font-mono">
       <AdminNavbar
         currentUser={currentUser}
         unreadCount={2}
@@ -348,24 +348,24 @@ export default function AdminEventWizardPage({ currentUser }) {
 
       <main className="max-w-7xl mx-auto w-full p-4 sm:p-8 overflow-y-auto text-left space-y-8 flex-1">
         {/* Header Strip */}
-        <div className="card-premium p-6 sm:p-8 space-y-4">
+        <div className="card-premium p-6 sm:p-8 space-y-4 border border-black/10">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <button
                 onClick={() => navigate("/events")}
-                className="inline-flex items-center gap-1 text-xs text-[#A39B89] font-bold hover:underline mb-1"
+                className="inline-flex items-center gap-1 text-xs text-[#22C55E] font-bold hover:underline mb-1"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                 </svg>
-                Back to Events Management
+                Back to Cohorts & Buildathons Management
               </button>
-              <h1 className="text-2xl sm:text-3xl font-bold font-poppins text-[#18191B] flex items-center gap-2">
+              <h1 className="text-2xl sm:text-3xl font-bold font-mono text-[#111] flex items-center gap-2">
                 {SVG_ICONS.publish}
-                {id ? "Edit Event" : "Create New Event"} — 23-Phase Interactive Wizard
+                {id ? "Edit Cohort / Buildathon" : "Launch New Cohort / Buildathon"} — Interactive Configuration Engine
               </h1>
-              <p className="text-xs text-[#5E6168] mt-1">
-                Configure event details, tracks, schedule, prizes, judges, custom registration form, eligibility, and live settings.
+              <p className="text-xs text-black/60 mt-1">
+                Configure cohort modules, buildathon details, tracks, schedule, prizes, mentors, registration requirements, and live settings.
               </p>
             </div>
 

@@ -80,9 +80,11 @@ export default function AdminLoginPage({ setCurrentUser }) {
 
         {/* Brand Header */}
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-[#090909] flex items-center justify-center text-white font-black shadow-md border border-[#22C55E]/30 shrink-0">
-            <ShieldCheck className="w-6 h-6 text-[#22C55E]" />
-          </div>
+          <img
+            src="/admin-logo.png"
+            alt="Admin Wing"
+            className="h-14 sm:h-16 w-auto object-contain shrink-0 hover:scale-105 transition-transform"
+          />
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xl font-bold tracking-wider text-[#111] font-mono">

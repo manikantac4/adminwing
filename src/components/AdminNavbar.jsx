@@ -55,7 +55,7 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
 
   const navLinks = [
     { name: "Home", path: "/", icon: LayoutDashboard },
-    { name: "Events & Hackathons", path: "/events", icon: ShieldCheck },
+    { name: "Cohorts & Buildathons", path: "/events", icon: ShieldCheck },
     { name: "Admin Directory", path: "/users", icon: Users },
   ];
 
@@ -65,9 +65,11 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
         {/* Brand Logo & Title */}
         <div className="flex items-center gap-2 sm:gap-6">
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#090909] flex items-center justify-center text-white font-black shadow-md group-hover:scale-105 transition-transform shrink-0 border border-[#22C55E]/30">
-              <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-[#22C55E]" />
-            </div>
+            <img
+              src="/admin-logo.png"
+              alt="Admin Wing"
+              className="h-9 sm:h-10 w-auto object-contain shrink-0 group-hover:scale-105 transition-transform"
+            />
             <div className="text-left">
               <div className="flex items-center gap-1 sm:gap-2">
                 <span className="text-sm sm:text-lg font-bold tracking-wider text-[#111] font-mono">
