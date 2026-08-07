@@ -270,6 +270,11 @@ export default function AdminEventWizardPage({ currentUser }) {
   const API_URL = "https://turingwings-backend.onrender.com/api/events";
 
   useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const initialType = searchParams.get("type");
+    if (initialType && !id) {
+      setFormData((prev) => ({ ...prev, type: initialType }));
+    }
     if (id) {
       fetchEventDetails();
     }
