@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
 import AdminEventsListPage from "./pages/AdminEventsListPage";
+import AdminCohortsListPage from "./pages/AdminCohortsListPage";
 import AdminEventWizardPage from "./pages/AdminEventWizardPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 
@@ -42,6 +43,14 @@ function AppContent() {
         element={
           <ProtectedRoute currentUser={currentUser}>
             <AdminDashboardPage currentUser={currentUser} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/cohorts"
+        element={
+          <ProtectedRoute currentUser={currentUser}>
+            <AdminCohortsListPage currentUser={currentUser} />
           </ProtectedRoute>
         }
       />

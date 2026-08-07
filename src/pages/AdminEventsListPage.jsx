@@ -22,7 +22,8 @@ export default function AdminEventsListPage({ currentUser }) {
       const res = await fetch(API_URL);
       if (res.ok) {
         const data = await res.json();
-        setEvents(data);
+        const buildathonEvents = data.filter((e) => e.type !== "Cohort" && e.type !== "cohort");
+        setEvents(buildathonEvents);
       }
     } catch (err) {
       console.error("Failed to fetch admin events:", err);
@@ -70,10 +71,10 @@ export default function AdminEventsListPage({ currentUser }) {
                 <svg className="w-7 h-7 text-[#22C55E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L5.6 15.12a2 2 0 01-1.182-1.182l-.477-2.387a6 6 0 01.517-3.86l.158-.318a6 6 0 00.517-3.86L4.74 3.128A2 2 0 015.922 1.946l2.387.477a6 6 0 003.86-.517l.318-.158a6 6 0 013.86-.517l2.387.477a2 2 0 011.182 1.182l.477 2.387a6 6 0 01-.517 3.86l-.158.318a6 6 0 00-.517 3.86l.477 2.387a2 2 0 01-.547 1.022z" />
                 </svg>
-                Cohorts & Buildathons Management
+                Buildathons & Events Management
               </h1>
               <p className="text-xs text-black/60 mt-1">
-                Launch new flagship cohorts, edit active buildathons, update module schedules, and oversee live builder registrations.
+                Configure hackathons, buildathons, workshops, registrations, and live dashboards across the platform.
               </p>
             </div>
 

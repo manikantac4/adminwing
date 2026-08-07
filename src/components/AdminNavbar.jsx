@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   ShieldCheck, LogOut, LayoutDashboard, Users, Menu, X, Bell,
-  MessageSquare, CheckCheck, User, ChevronDown
+  MessageSquare, CheckCheck, User, ChevronDown, BookOpen
 } from "lucide-react";
 
 export default function AdminNavbar({ currentUser, toggleChatbot }) {
@@ -55,7 +55,8 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
 
   const navLinks = [
     { name: "Home", path: "/", icon: LayoutDashboard },
-    { name: "Cohorts & Buildathons", path: "/events", icon: ShieldCheck },
+    { name: "Cohorts 🚀", path: "/cohorts", icon: BookOpen },
+    { name: "Buildathons & Events ⚡", path: "/events", icon: ShieldCheck },
     { name: "Admin Directory", path: "/users", icon: Users },
   ];
 
