@@ -2,58 +2,83 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cascadia+Code:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   body {
-    font-family: 'Inter', sans-serif;
-    background-color: #FFFFFF;
-    color: #18191B;
+    font-family: 'Cascadia Code', monospace;
+    background-color: #FAFAFA;
+    color: #090909;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Cascadia Code', monospace;
+    letter-spacing: -0.03em;
   }
+}
+
+/* Eyebrow Utility */
+.eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: rgba(0, 0, 0, 0.5);
+  text-transform: uppercase;
 }
 
 /* Custom Card Utility */
 .card-premium {
-  background-color: #FCFCFD;
-  border: 1px solid #E5E7EB;
-  border-radius: 18px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  background-color: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
 }
 
 .btn-primary-custom {
-  background-color: #18191B;
+  background-color: #090909;
   color: #FFFFFF;
-  border-radius: 12px;
-  transition: all 0.2s ease-in-out;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all 0.25s ease-in-out;
 }
 .btn-primary-custom:hover {
-  background-color: #A39B89;
-  color: #FFFFFF;
+  background-color: #22C55E;
+  color: #04160C !important;
 }
 
 .btn-secondary-custom {
   background-color: #FFFFFF;
-  border: 2px solid #18191B;
-  color: #18191B;
-  border-radius: 12px;
-  transition: all 0.2s ease-in-out;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  color: #090909;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all 0.25s ease-in-out;
 }
 .btn-secondary-custom:hover {
-  background-color: #18191B;
-  color: #FFFFFF;
+  border-color: #22C55E;
+  background-color: rgba(34, 197, 94, 0.08);
+  color: #22C55E;
 }
 
 .bg-hero-gradient {
-  background: linear-gradient(180deg, #FFFFFF 0%, #F8F9FB 100%);
+  background: #FAFAFA;
 }
 
 .btn-hero-gradient {
-  background: linear-gradient(135deg, #18191B 0%, #A39B89 100%);
+  background: #090909;
   color: #FFFFFF;
+  border-radius: 9999px;
+  transition: all 0.25s ease-in-out;
+}
+.btn-hero-gradient:hover {
+  background: #22C55E;
+  color: #04160C !important;
 }
 
 /* Custom Scrollbar */
@@ -62,12 +87,12 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #F8F9FB;
+  background: #FAFAFA;
 }
 ::-webkit-scrollbar-thumb {
-  background: #A39B89;
+  background: #22C55E;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #8D7A4F;
+  background: #16a34a;
 }

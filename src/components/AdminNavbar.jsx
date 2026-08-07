@@ -65,23 +65,23 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
         {/* Brand Logo & Title */}
         <div className="flex items-center gap-2 sm:gap-6">
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-[#18191B] to-[#A39B89] flex items-center justify-center text-white font-black shadow-md group-hover:scale-105 transition-transform shrink-0">
-              <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-[#C9B27D]" />
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#090909] flex items-center justify-center text-white font-black shadow-md group-hover:scale-105 transition-transform shrink-0 border border-[#22C55E]/30">
+              <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-[#22C55E]" />
             </div>
             <div className="text-left">
               <div className="flex items-center gap-1 sm:gap-2">
-                <span className="text-sm sm:text-lg font-bold tracking-wider text-[#18191B] font-poppins">
-                  ADMIN<span className="text-[#A39B89]">WING</span>
+                <span className="text-sm sm:text-lg font-bold tracking-wider text-[#111] font-mono">
+                  ADMIN<span className="text-[#22C55E]">WING</span>
                 </span>
-                <span className="hidden xs:inline px-1.5 py-0.5 rounded-full text-[8px] sm:text-[9px] font-bold uppercase bg-[#F8F9FB] border border-[#E5E7EB] text-[#5E6168]">
-                  HQ
+                <span className="hidden xs:inline px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] font-bold uppercase bg-[#22C55E]/10 border border-[#22C55E]/30 text-[#22C55E]">
+                  HQ COMMAND
                 </span>
               </div>
             </div>
           </Link>
 
           {/* Desktop Navigation Tabs */}
-          <nav className="hidden md:flex items-center gap-1.5 pl-4 border-l border-[#E5E7EB]">
+          <nav className="hidden md:flex items-center gap-1.5 pl-4 border-l border-black/10">
             {navLinks.map((link) => {
               const Icon = link.icon;
               const isActive = location.pathname === link.path;
@@ -90,13 +90,13 @@ export default function AdminNavbar({ currentUser, toggleChatbot }) {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
                     isActive
-                      ? "bg-[#18191B] text-white font-bold shadow-md"
-                      : "text-[#5E6168] hover:bg-[#F8F9FB] hover:text-[#18191B]"
+                      ? "bg-[#090909] text-white shadow-md"
+                      : "text-black/60 hover:bg-black/5 hover:text-[#22C55E]"
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5" />
+                  <Icon className="w-3.5 h-3.5 text-[#22C55E]" />
                   <span>{link.name}</span>
                 </Link>
               );

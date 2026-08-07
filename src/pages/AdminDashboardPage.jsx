@@ -29,7 +29,7 @@ export default function AdminDashboardPage({ currentUser }) {
   };
 
   return (
-    <div className="min-h-screen bg-hero-gradient text-[#18191B] selection:bg-[#A39B89] selection:text-white flex flex-col font-sans">
+    <div className="min-h-screen bg-[#FAFAFA] text-[#090909] selection:bg-[#22C55E] selection:text-black flex flex-col font-mono">
       <AdminNavbar
         currentUser={currentUser}
         unreadCount={2}
@@ -39,19 +39,19 @@ export default function AdminDashboardPage({ currentUser }) {
       <main className="max-w-7xl mx-auto w-full p-4 sm:p-8 overflow-y-auto text-left space-y-8 flex-1">
         
         {/* HERO HEADER SECTION WITH PREMIUM GRADIENT */}
-        <div className="card-premium p-6 sm:p-8 space-y-4">
+        <div className="card-premium p-6 sm:p-8 space-y-4 border border-black/10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="w-2 h-2 rounded-full bg-[#A39B89] animate-pulse" />
-                <span className="text-xs font-bold uppercase text-[#A39B89] font-mono">
+                <span className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse" />
+                <span className="text-xs font-bold uppercase text-[#22C55E] font-mono">
                   HQ COMMAND CENTER • TURING WINGS
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold font-poppins text-[#18191B]">
+              <h1 className="text-2xl sm:text-3xl font-bold font-mono text-[#111]">
                 Mentor Control Gateway & Hackathon Manager
               </h1>
-              <p className="text-xs text-[#5E6168] mt-1">
+              <p className="text-xs text-black/60 mt-1">
                 Manage live hackathons, buildathons, real-time registrations, and mentor communications.
               </p>
             </div>
@@ -59,9 +59,9 @@ export default function AdminDashboardPage({ currentUser }) {
             <div className="flex items-center gap-3">
               <Link
                 to="/events/new"
-                className="px-5 py-3 rounded-xl bg-[#18191B] hover:bg-[#2A2C30] text-white font-extrabold text-xs flex items-center gap-2 shadow-md transition-all shrink-0"
+                className="button-primary text-xs shrink-0"
               >
-                <svg className="w-4 h-4 text-[#A39B89]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-[#22C55E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                 </svg>
                 <span>Launch New Event Wizard</span>
