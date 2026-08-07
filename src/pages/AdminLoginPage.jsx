@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ShieldCheck, Mail, Lock, AlertCircle, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, Mail, Lock, AlertCircle, CheckCircle2, ArrowRight } from "lucide-react";
 
 export default function AdminLoginPage({ setCurrentUser }) {
   const [formData, setFormData] = useState({ usernameOrEmail: "", password: "" });
@@ -31,7 +31,7 @@ export default function AdminLoginPage({ setCurrentUser }) {
         throw new Error("Access Denied: Account is not a registered Lead Mentor Admin.");
       }
 
-      // Explicitly trigger Google Password Manager Save Credential API if supported by browser
+      // Trigger Google Password Manager Save Credential API if supported by browser
       if (window.PasswordCredential && navigator.credentials) {
         try {
           const cred = new window.PasswordCredential({
@@ -69,64 +69,79 @@ export default function AdminLoginPage({ setCurrentUser }) {
   };
 
   return (
-    <div className="min-h-screen bg-hero-gradient text-[#18191B] flex items-center justify-center p-4 selection:bg-[#A39B89] selection:text-white font-sans">
-      <div className="w-full max-w-md card-premium p-8 rounded-3xl text-left border border-[#E5E7EB] shadow-glow space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#18191B] to-[#A39B89] flex items-center justify-center text-white font-black shadow-md">
-            <ShieldCheck className="w-7 h-7 text-[#C9B27D]" />
+    <div className="min-h-screen bg-[#FAFAFA] text-[#090909] flex items-center justify-center p-6 selection:bg-[#22C55E] selection:text-black font-mono">
+      <div className="w-full max-w-md bg-white p-8 sm:p-10 rounded-3xl text-left border border-black/10 shadow-xl space-y-7 relative overflow-hidden">
+        
+        {/* L-Corner Bracket Marks */}
+        <span className="absolute top-3 left-3 w-3 h-3 border-t-2 border-l-2 border-black/20" />
+        <span className="absolute top-3 right-3 w-3 h-3 border-t-2 border-r-2 border-black/20" />
+        <span className="absolute bottom-3 left-3 w-3 h-3 border-b-2 border-l-2 border-black/20" />
+        <span className="absolute bottom-3 right-3 w-3 h-3 border-b-2 border-r-2 border-black/20" />
+
+        {/* Brand Header */}
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-[#090909] flex items-center justify-center text-white font-black shadow-md border border-[#22C55E]/30 shrink-0">
+            <ShieldCheck className="w-6 h-6 text-[#22C55E]" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold font-poppins text-[#18191B]">
-              ADMIN<span className="text-[#A39B89]">WING</span>
-            </h1>
-            <span className="text-xs text-[#5E6168] font-mono">
-              Lead Mentor Authentication Gateway
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xl font-bold tracking-wider text-[#111] font-mono">
+                ADMIN<span className="text-[#22C55E]">WING</span>
+              </span>
+              <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-[#22C55E]/10 border border-[#22C55E]/30 text-[#22C55E]">
+                HQ
+              </span>
+            </div>
+            <p className="text-[10px] text-black/50 font-bold uppercase tracking-widest mt-0.5">
+              LEAD MENTOR GATEWAY
+            </p>
           </div>
         </div>
 
+        {/* Error Notification */}
         {error && (
-          <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2 font-semibold">
+          <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2.5 font-semibold animate-in fade-in">
             <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
+        {/* Success Notification */}
         {success && (
-          <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2 font-semibold">
+          <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2.5 font-semibold animate-in fade-in">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>{success}</span>
           </div>
         )}
 
-        {/* Standard Form with Password Manager Autofill & Save Triggers */}
-        <form onSubmit={handleLogin} method="POST" action="#" className="space-y-4">
+        {/* Credentials Form */}
+        <form onSubmit={handleLogin} method="POST" action="#" className="space-y-5">
           <div>
-            <label htmlFor="admin-username" className="block text-xs font-bold uppercase text-[#5E6168] mb-1">
+            <label htmlFor="admin-username" className="block text-[10px] font-bold uppercase text-black/50 tracking-wider mb-1.5">
               Username or Email
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-[#8B9098] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Mail className="w-4 h-4 text-black/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 id="admin-username"
                 name="username"
                 type="text"
                 autoComplete="username"
                 required
-                placeholder="Enter username or email"
+                placeholder="mentor@turingwings.org"
                 value={formData.usernameOrEmail}
                 onChange={(e) => setFormData({ ...formData, usernameOrEmail: e.target.value })}
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-[#E5E7EB] text-xs text-[#18191B] focus:outline-none focus:border-[#A39B89] font-medium"
+                className="w-full pl-10 pr-4 py-3.5 rounded-xl bg-[#FAF8F5] border border-black/15 text-xs text-[#111] focus:outline-none focus:border-[#22C55E] focus:bg-white font-mono font-medium transition-all"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="admin-password" className="block text-xs font-bold uppercase text-[#5E6168] mb-1">
+            <label htmlFor="admin-password" className="block text-[10px] font-bold uppercase text-black/50 tracking-wider mb-1.5">
               Password
             </label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-[#8B9098] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Lock className="w-4 h-4 text-black/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 id="admin-password"
                 name="password"
@@ -136,7 +151,7 @@ export default function AdminLoginPage({ setCurrentUser }) {
                 placeholder="••••••••••••"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-[#E5E7EB] text-xs text-[#18191B] focus:outline-none focus:border-[#A39B89] font-medium"
+                className="w-full pl-10 pr-4 py-3.5 rounded-xl bg-[#FAF8F5] border border-black/15 text-xs text-[#111] focus:outline-none focus:border-[#22C55E] focus:bg-white font-mono font-medium transition-all"
               />
             </div>
           </div>
@@ -144,15 +159,17 @@ export default function AdminLoginPage({ setCurrentUser }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 btn-hero-gradient font-bold text-xs shadow-md hover:scale-[1.02] transition-all"
+            className="button-primary w-full justify-center py-3.5 text-xs tracking-widest shrink-0"
           >
-            {loading ? "Authenticating..." : "Sign In to AdminWing"}
+            <span>{loading ? "Authenticating..." : "Sign In to AdminWing"}</span>
+            <ArrowRight className="w-4 h-4 text-[#22C55E]" />
           </button>
         </form>
 
-        <div className="pt-3 border-t border-[#E5E7EB] text-center text-[11px] text-[#8B9098] font-mono">
-          <span>Protected Lead Mentor Access Gateway</span>
+        <div className="pt-4 border-t border-black/10 text-center text-[10px] text-black/50 font-bold uppercase tracking-widest">
+          Protected Lead Mentor Access Gateway
         </div>
+
       </div>
     </div>
   );
