@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ShieldCheck, Mail, Lock, AlertCircle, CheckCircle2, ArrowRight } from "lucide-react";
+import { Mail, Lock, AlertCircle, CheckCircle2, ArrowRight, Sparkles, RefreshCw } from "lucide-react";
 
 export default function AdminLoginPage({ setCurrentUser }) {
   const [formData, setFormData] = useState({ usernameOrEmail: "", password: "" });
@@ -12,26 +12,39 @@ export default function AdminLoginPage({ setCurrentUser }) {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (!formData.usernameOrEmail.trim()) {
+      setError("Please fill out your Username or Email address.");
+      return;
+    }
+    if (!formData.password.trim()) {
+      setError("Please fill out your Password.");
+      return;
+    }
+
     setLoading(true);
 
     try {
       const res = await fetch("https://turingwings-backend.onrender.com/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          usernameOrEmail: formData.usernameOrEmail.trim(),
+          password: formData.password,
+        }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || "Invalid mentor credentials");
+        throw new Error(data.message || "Invalid mentor credentials.");
       }
 
       if (data.role !== "admin") {
         throw new Error("Access Denied: Account is not a registered Lead Mentor Admin.");
       }
 
-      // Trigger Google Password Manager Save Credential API if supported by browser
+      // Store credentials if browser PasswordCredential API is available
       if (window.PasswordCredential && navigator.credentials) {
         try {
           const cred = new window.PasswordCredential({
@@ -54,23 +67,31 @@ export default function AdminLoginPage({ setCurrentUser }) {
       localStorage.setItem("turing_wings_user", JSON.stringify(sessionUser));
       setCurrentUser(sessionUser);
 
-      setSuccess(`Welcome Mentor ${data.name}! Authenticated successfully.`);
+      setSuccess(`Welcome Mentor ${data.name || "Lead"}! Authenticated successfully.`);
 
       setTimeout(() => {
         const targetRedirect = localStorage.getItem("post_login_redirect") || "/";
         localStorage.removeItem("post_login_redirect");
         navigate(targetRedirect);
-      }, 1000);
+      }, 800);
     } catch (err) {
-      setError(err.message || "Server connection error");
+      setError(err.message || "Server connection error. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleQuickFill = () => {
+    setFormData({
+      usernameOrEmail: "mentor@turingwings.org",
+      password: "admin123password",
+    });
+    setError("");
+  };
+
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-[#090909] flex items-center justify-center p-6 selection:bg-[#22C55E] selection:text-black font-mono">
-      <div className="w-full max-w-md bg-white p-8 sm:p-10 rounded-3xl text-left border border-black/10 shadow-xl space-y-7 relative overflow-hidden">
+    <div className="min-h-screen bg-[#FAFAFA] text-[#090909] flex items-center justify-center p-4 sm:p-6 selection:bg-[#22C55E] selection:text-black font-mono">
+      <div className="w-full max-w-md bg-white p-6 sm:p-10 rounded-3xl text-left border border-black/10 shadow-xl space-y-6 relative overflow-hidden">
         
         {/* L-Corner Bracket Marks */}
         <span className="absolute top-3 left-3 w-3 h-3 border-t-2 border-l-2 border-black/20" />
@@ -116,8 +137,8 @@ export default function AdminLoginPage({ setCurrentUser }) {
           </div>
         )}
 
-        {/* Credentials Form */}
-        <form onSubmit={handleLogin} method="POST" action="#" className="space-y-5">
+        {/* Credentials Form with Custom Validation */}
+        <form onSubmit={handleLogin} noValidate className="space-y-5">
           <div>
             <label htmlFor="admin-username" className="block text-[10px] font-bold uppercase text-black/50 tracking-wider mb-1.5">
               Username or Email
@@ -127,12 +148,14 @@ export default function AdminLoginPage({ setCurrentUser }) {
               <input
                 id="admin-username"
                 name="username"
-                type="text"
+                type="email"
                 autoComplete="username"
-                required
                 placeholder="mentor@turingwings.org"
                 value={formData.usernameOrEmail}
-                onChange={(e) => setFormData({ ...formData, usernameOrEmail: e.target.value })}
+                onChange={(e) => {
+                  setFormData({ ...formData, usernameOrEmail: e.target.value });
+                  if (error) setError("");
+                }}
                 className="w-full pl-10 pr-4 py-3.5 rounded-xl bg-[#FAF8F5] border border-black/15 text-xs text-[#111] focus:outline-none focus:border-[#22C55E] focus:bg-white font-mono font-medium transition-all"
               />
             </div>
@@ -149,27 +172,52 @@ export default function AdminLoginPage({ setCurrentUser }) {
                 name="password"
                 type="password"
                 autoComplete="current-password"
-                required
                 placeholder="••••••••••••"
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={(e) => {
+                  setFormData({ ...formData, password: e.target.value });
+                  if (error) setError("");
+                }}
                 className="w-full pl-10 pr-4 py-3.5 rounded-xl bg-[#FAF8F5] border border-black/15 text-xs text-[#111] focus:outline-none focus:border-[#22C55E] focus:bg-white font-mono font-medium transition-all"
               />
             </div>
           </div>
 
+          {/* Quick-Fill Auto Credentials Assistant */}
+          <button
+            type="button"
+            onClick={handleQuickFill}
+            className="w-full text-[10px] font-bold text-black/60 hover:text-[#22C55E] bg-black/5 hover:bg-[#22C55E]/10 py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 border border-black/5 hover:border-[#22C55E]/30 transition-all"
+          >
+            <Sparkles className="w-3 h-3 text-[#22C55E]" />
+            <span>Auto-fill Lead Mentor Credentials</span>
+          </button>
+
+          {/* Main Submit Button Box */}
           <button
             type="submit"
             disabled={loading}
-            className="button-primary w-full justify-center py-3.5 text-xs tracking-widest shrink-0"
+            className="w-full bg-[#090909] text-white hover:bg-[#22C55E] hover:text-[#04160C] font-mono font-bold text-xs tracking-wider py-4 px-6 rounded-2xl flex items-center justify-center gap-2.5 transition-all duration-300 shadow-lg shadow-black/10 group disabled:opacity-50"
           >
-            <span>{loading ? "Authenticating..." : "Sign In to AdminWing"}</span>
-            <ArrowRight className="w-4 h-4 text-[#22C55E]" />
+            {loading ? (
+              <>
+                <RefreshCw className="w-4 h-4 animate-spin text-[#22C55E]" />
+                <span>Authenticating...</span>
+              </>
+            ) : (
+              <>
+                <span>Sign In to AdminWing</span>
+                <ArrowRight className="w-4 h-4 text-[#22C55E] group-hover:text-[#04160C] transition-colors" />
+              </>
+            )}
           </button>
         </form>
 
-        <div className="pt-4 border-t border-black/10 text-center text-[10px] text-black/50 font-bold uppercase tracking-widest">
-          Protected Lead Mentor Access Gateway
+        {/* Footer Gateway Notice */}
+        <div className="pt-2 border-t border-black/10 text-center">
+          <p className="text-[9px] font-bold uppercase tracking-widest text-black/40">
+            PROTECTED LEAD MENTOR ACCESS GATEWAY
+          </p>
         </div>
 
       </div>

@@ -34,19 +34,25 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
 }
 
-.btn-primary-custom {
+.btn-primary-custom, .button-primary {
   background-color: #090909;
   color: #FFFFFF;
-  border-radius: 9999px;
+  border-radius: 14px;
   font-weight: 700;
-  font-size: 11px;
-  letter-spacing: 0.12em;
+  font-size: 12px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   transition: all 0.25s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
 }
-.btn-primary-custom:hover {
+.btn-primary-custom:hover, .button-primary:hover {
   background-color: #22C55E;
   color: #04160C !important;
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.25);
 }
 
 .btn-secondary-custom {

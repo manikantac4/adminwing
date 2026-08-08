@@ -588,8 +588,8 @@ export default function AdminEventWizardPage({ currentUser }) {
                     onChange={(e) => handleInputChange("templateId", e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl bg-[#F8F9FA] border border-[#E5E7EB] text-sm text-[#18191B] outline-none"
                   >
+                    <option value="greenspace">Green Space Matrix (Circuit Nodes & Lime Particles)</option>
                     <option value="ai-future">AI Future (Gold & Glassmorphism)</option>
-                    <option value="cyberpunk">Cyberpunk Neon</option>
                     <option value="space">Space Odyssey</option>
                     <option value="corporate">Corporate Pro</option>
                     <option value="premium-3d">Premium 3D Spatial</option>
