@@ -13,28 +13,20 @@ export default function AdminDashboardPage({ currentUser }) {
   // Pre-configured Flagship Cohorts overview
   const defaultCohorts = deduplicateItems([
     {
-      _id: "cohort-1",
-      name: "AI-Native Software Development Cohort",
+      _id: "cohort-ai-engineering",
+      name: "AI Engineering Cohort",
       status: "Active",
-      duration: "8 Weeks",
+      duration: "4 Weeks",
       enrolledCount: 142,
       startDate: "August 2026",
     },
     {
-      _id: "cohort-2",
-      name: "Autonomous Agent Engineering Cohort",
+      _id: "cohort-ai-cybersecurity",
+      name: "AI & Cybersecurity Cohort",
       status: "Enrolling",
-      duration: "10 Weeks",
+      duration: "4 Weeks",
       enrolledCount: 98,
       startDate: "September 2026",
-    },
-    {
-      _id: "cohort-3",
-      name: "AI Cybersecurity & Defense Cohort",
-      status: "Upcoming",
-      duration: "6 Weeks",
-      enrolledCount: 64,
-      startDate: "October 2026",
     },
   ]);
 
@@ -57,6 +49,8 @@ export default function AdminDashboardPage({ currentUser }) {
     }
   };
 
+  const cohortEvents = deduplicateItems(events.filter((e) => e.type === "Cohort" || e.type === "cohort" || e.category === "cohort"));
+  const activeCohorts = cohortEvents.length > 0 ? cohortEvents : defaultCohorts;
   const buildathonEvents = deduplicateItems(events.filter((e) => e.type !== "Cohort" && e.type !== "cohort"));
 
   return (
@@ -158,7 +152,7 @@ export default function AdminDashboardPage({ currentUser }) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {defaultCohorts.map((cohort) => (
+            {activeCohorts.map((cohort) => (
               <div
                 key={cohort._id}
                 className="bg-white border border-black/10 hover:border-[#22C55E] rounded-2xl p-6 shadow-xs flex flex-col justify-between space-y-4 transition-all"

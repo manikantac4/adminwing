@@ -18,38 +18,27 @@ export default function AdminCohortsListPage({ currentUser }) {
   // Pre-configured Flagship Cohorts for instant display & management
   const defaultCohorts = [
     {
-      _id: "cohort-1",
-      name: "AI-Native Software Development Cohort",
-      slug: "ai-native-software-development",
+      _id: "cohort-ai-engineering",
+      name: "AI Engineering Cohort",
+      slug: "ai-engineering",
       type: "Cohort",
       status: "Active",
-      duration: "8 Weeks",
+      duration: "4 Weeks",
       enrolledCount: 142,
-      shortDescription: "Master end-to-end product development with integrated AI agent workflows, prompt engineering, and production cloud deployment.",
+      shortDescription: "From web fundamentals to building, deploying, securing and launching modern AI-powered products.",
       startDate: "August 2026",
     },
     {
-      _id: "cohort-2",
-      name: "Autonomous Agent Engineering Cohort",
-      slug: "autonomous-agent-engineering",
+      _id: "cohort-ai-cybersecurity",
+      name: "AI & Cybersecurity Cohort",
+      slug: "ai-cybersecurity",
       type: "Cohort",
       status: "Enrolling",
-      duration: "10 Weeks",
+      duration: "4 Weeks",
       enrolledCount: 98,
-      shortDescription: "Build reasoning multi-agent orchestration engines, tool execution pipelines, and continuous vector memory architectures.",
+      shortDescription: "Networking Fundamentals, Web Security, AI-Assisted Scripting, and Autonomous AI Security Agents.",
       startDate: "September 2026",
     },
-    {
-      _id: "cohort-3",
-      name: "AI Cybersecurity & Defense Cohort",
-      slug: "ai-cybersecurity-defense",
-      type: "Cohort",
-      status: "Upcoming",
-      duration: "6 Weeks",
-      enrolledCount: 64,
-      shortDescription: "Learn automated vulnerability discovery, zero-trust RBAC protocols, and AI-assisted security engineering.",
-      startDate: "October 2026",
-    }
   ];
 
   useEffect(() => {
@@ -63,8 +52,7 @@ export default function AdminCohortsListPage({ currentUser }) {
       if (res.ok) {
         const data = await res.json();
         const cohortEvents = data.filter((e) => e.type === "Cohort" || e.type === "cohort" || e.category === "cohort");
-        const mergedList = cohortEvents.length > 0 ? [...cohortEvents, ...defaultCohorts] : defaultCohorts;
-        setCohorts(deduplicateItems(mergedList));
+        setCohorts(deduplicateItems(cohortEvents.length > 0 ? cohortEvents : defaultCohorts));
       } else {
         setCohorts(deduplicateItems(defaultCohorts));
       }
