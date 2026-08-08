@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Search, RefreshCw } from "lucide-react";
 import AdminNavbar from "../components/AdminNavbar";
 import AdminChatWidget from "../components/AdminChatWidget";
+import { secureFetch, deduplicateItems } from "../utils/api";
 
 export default function AdminUsersPage({ currentUser }) {
   const [users, setUsers] = useState([]);
@@ -9,7 +10,12 @@ export default function AdminUsersPage({ currentUser }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
 
-  const token = localStorage.getItem("turing_wings_token");
+  const defaultAdmins = [
+    { _id: "1", name: "Ratnakar Karasala", username: "ratnakar.karasala", email: "ratnakar.karasala@turingwings.org", role: "admin", createdAt: new Date() },
+    { _id: "2", name: "Sahith Akula", username: "sahith.akula", email: "sahith.akula@turingwings.org", role: "admin", createdAt: new Date() },
+    { _id: "3", name: "Manoj Kumar Allu", username: "manoj.allu", email: "manoj.allu@turingwings.org", role: "admin", createdAt: new Date() },
+    { _id: "4", name: "Pandu Ranga Tummuri", username: "pandu.tummuri", email: "pandu.tummuri@turingwings.org", role: "admin", createdAt: new Date() },
+  ];
 
   useEffect(() => {
     fetchUsers();
@@ -18,22 +24,15 @@ export default function AdminUsersPage({ currentUser }) {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await fetch("https://turingwings-backend.onrender.com/api/admin/users", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await secureFetch("https://turingwings-backend.onrender.com/api/admin/users");
       if (res.ok) {
         const data = await res.json();
-        setUsers(data);
+        setUsers(deduplicateItems(data.length > 0 ? [...data, ...defaultAdmins] : defaultAdmins));
       } else {
-        throw new Error("Failed to load users");
+        setUsers(deduplicateItems(defaultAdmins));
       }
     } catch (err) {
-      setUsers([
-        { _id: "1", name: "Ratnakar Karasala", username: "ratnakar.karasala", email: "ratnakar.karasala@turingwings.org", role: "admin", createdAt: new Date() },
-        { _id: "2", name: "Sahith Akula", username: "sahith.akula", email: "sahith.akula@turingwings.org", role: "admin", createdAt: new Date() },
-        { _id: "3", name: "Manoj Kumar Allu", username: "manoj.allu", email: "manoj.allu@turingwings.org", role: "admin", createdAt: new Date() },
-        { _id: "4", name: "Pandu Ranga Tummuri", username: "pandu.tummuri", email: "pandu.tummuri@turingwings.org", role: "admin", createdAt: new Date() },
-      ]);
+      setUsers(deduplicateItems(defaultAdmins));
     } finally {
       setLoading(false);
     }

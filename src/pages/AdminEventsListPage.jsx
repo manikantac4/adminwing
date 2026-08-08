@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AdminNavbar from "../components/AdminNavbar";
 import AdminChatWidget from "../components/AdminChatWidget";
+import { secureFetch, deduplicateItems } from "../utils/api";
 
 export default function AdminEventsListPage({ currentUser }) {
   const navigate = useNavigate();
@@ -19,11 +20,11 @@ export default function AdminEventsListPage({ currentUser }) {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const res = await fetch(API_URL);
+      const res = await secureFetch(API_URL);
       if (res.ok) {
         const data = await res.json();
         const buildathonEvents = data.filter((e) => e.type !== "Cohort" && e.type !== "cohort");
-        setEvents(buildathonEvents);
+        setEvents(deduplicateItems(buildathonEvents));
       }
     } catch (err) {
       console.error("Failed to fetch admin events:", err);
@@ -35,11 +36,11 @@ export default function AdminEventsListPage({ currentUser }) {
   const handleDelete = async (id, name) => {
     if (!window.confirm(`Are you sure you want to delete event "${name}"?`)) return;
     try {
-      const res = await fetch(`https://turingwings-backend.onrender.com/api/events/${id}`, {
+      const res = await secureFetch(`https://turingwings-backend.onrender.com/api/events/${id}`, {
         method: "DELETE",
       });
       if (res.ok) {
-        setEvents((prev) => prev.filter((e) => e._id !== id));
+        setEvents((prev) => deduplicateItems(prev.filter((e) => e._id !== id)));
         setDeleteMessage(`Deleted "${name}" successfully.`);
         setTimeout(() => setDeleteMessage(""), 3000);
       }

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { LayoutDashboard, BookOpen, ShieldCheck, Users, ArrowUpRight, Activity, Layers, Calendar, CheckCircle2 } from "lucide-react";
 import AdminNavbar from "../components/AdminNavbar";
 import AdminChatWidget from "../components/AdminChatWidget";
+import { secureFetch, deduplicateItems } from "../utils/api";
 
 export default function AdminDashboardPage({ currentUser }) {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
@@ -10,7 +11,7 @@ export default function AdminDashboardPage({ currentUser }) {
   const [loadingEvents, setLoadingEvents] = useState(true);
 
   // Pre-configured Flagship Cohorts overview
-  const defaultCohorts = [
+  const defaultCohorts = deduplicateItems([
     {
       _id: "cohort-1",
       name: "AI-Native Software Development Cohort",
@@ -35,7 +36,7 @@ export default function AdminDashboardPage({ currentUser }) {
       enrolledCount: 64,
       startDate: "October 2026",
     },
-  ];
+  ]);
 
   useEffect(() => {
     fetchEvents();
@@ -44,10 +45,10 @@ export default function AdminDashboardPage({ currentUser }) {
   const fetchEvents = async () => {
     try {
       setLoadingEvents(true);
-      const res = await fetch("https://turingwings-backend.onrender.com/api/events/all");
+      const res = await secureFetch("https://turingwings-backend.onrender.com/api/events/all");
       if (res.ok) {
         const data = await res.json();
-        setEvents(data);
+        setEvents(deduplicateItems(data));
       }
     } catch (err) {
       console.error("Error loading events for dashboard:", err);
@@ -56,7 +57,7 @@ export default function AdminDashboardPage({ currentUser }) {
     }
   };
 
-  const buildathonEvents = events.filter((e) => e.type !== "Cohort" && e.type !== "cohort");
+  const buildathonEvents = deduplicateItems(events.filter((e) => e.type !== "Cohort" && e.type !== "cohort"));
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-[#090909] selection:bg-[#22C55E] selection:text-black flex flex-col font-mono">

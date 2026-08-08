@@ -4,6 +4,8 @@ import { BookOpen, Plus, RefreshCw, Trash2, Edit, Users, Sparkles, ArrowUpRight 
 import AdminNavbar from "../components/AdminNavbar";
 import AdminChatWidget from "../components/AdminChatWidget";
 
+import { secureFetch, deduplicateItems } from "../utils/api";
+
 export default function AdminCohortsListPage({ currentUser }) {
   const navigate = useNavigate();
   const [cohorts, setCohorts] = useState([]);
@@ -57,16 +59,17 @@ export default function AdminCohortsListPage({ currentUser }) {
   const fetchCohorts = async () => {
     try {
       setLoading(true);
-      const res = await fetch(API_URL);
+      const res = await secureFetch(API_URL);
       if (res.ok) {
         const data = await res.json();
         const cohortEvents = data.filter((e) => e.type === "Cohort" || e.type === "cohort" || e.category === "cohort");
-        setCohorts(cohortEvents.length > 0 ? cohortEvents : defaultCohorts);
+        const mergedList = cohortEvents.length > 0 ? [...cohortEvents, ...defaultCohorts] : defaultCohorts;
+        setCohorts(deduplicateItems(mergedList));
       } else {
-        setCohorts(defaultCohorts);
+        setCohorts(deduplicateItems(defaultCohorts));
       }
     } catch {
-      setCohorts(defaultCohorts);
+      setCohorts(deduplicateItems(defaultCohorts));
     } finally {
       setLoading(false);
     }
@@ -75,11 +78,11 @@ export default function AdminCohortsListPage({ currentUser }) {
   const handleDelete = async (id, name) => {
     if (!window.confirm(`Are you sure you want to delete Cohort "${name}"?`)) return;
     try {
-      const res = await fetch(`https://turingwings-backend.onrender.com/api/events/${id}`, {
+      const res = await secureFetch(`https://turingwings-backend.onrender.com/api/events/${id}`, {
         method: "DELETE",
       });
       if (res.ok) {
-        setCohorts((prev) => prev.filter((c) => c._id !== id));
+        setCohorts((prev) => deduplicateItems(prev.filter((c) => c._id !== id)));
         setDeleteMessage(`Deleted "${name}" successfully.`);
         setTimeout(() => setDeleteMessage(""), 3000);
       }
