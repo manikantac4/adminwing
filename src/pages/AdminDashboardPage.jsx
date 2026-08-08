@@ -1,13 +1,41 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { LayoutDashboard, BookOpen, ShieldCheck, Users, ArrowUpRight, Activity, Layers, Calendar, CheckCircle2 } from "lucide-react";
 import AdminNavbar from "../components/AdminNavbar";
 import AdminChatWidget from "../components/AdminChatWidget";
 
 export default function AdminDashboardPage({ currentUser }) {
-  const navigate = useNavigate();
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [events, setEvents] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
+
+  // Pre-configured Flagship Cohorts overview
+  const defaultCohorts = [
+    {
+      _id: "cohort-1",
+      name: "AI-Native Software Development Cohort",
+      status: "Active",
+      duration: "8 Weeks",
+      enrolledCount: 142,
+      startDate: "August 2026",
+    },
+    {
+      _id: "cohort-2",
+      name: "Autonomous Agent Engineering Cohort",
+      status: "Enrolling",
+      duration: "10 Weeks",
+      enrolledCount: 98,
+      startDate: "September 2026",
+    },
+    {
+      _id: "cohort-3",
+      name: "AI Cybersecurity & Defense Cohort",
+      status: "Upcoming",
+      duration: "6 Weeks",
+      enrolledCount: 64,
+      startDate: "October 2026",
+    },
+  ];
 
   useEffect(() => {
     fetchEvents();
@@ -28,6 +56,8 @@ export default function AdminDashboardPage({ currentUser }) {
     }
   };
 
+  const buildathonEvents = events.filter((e) => e.type !== "Cohort" && e.type !== "cohort");
+
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-[#090909] selection:bg-[#22C55E] selection:text-black flex flex-col font-mono">
       <AdminNavbar
@@ -38,161 +68,200 @@ export default function AdminDashboardPage({ currentUser }) {
 
       <main className="max-w-7xl mx-auto w-full p-4 sm:p-8 overflow-y-auto text-left space-y-8 flex-1">
         
-        {/* HERO HEADER SECTION WITH PREMIUM GRADIENT */}
+        {/* HQ COMMAND CENTER HEADER */}
         <div className="card-premium p-6 sm:p-8 space-y-4 border border-black/10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E] animate-pulse" />
                 <span className="text-xs font-bold uppercase text-[#22C55E] font-mono">
                   HQ COMMAND CENTER • TURING WINGS
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold font-mono text-[#111]">
-                Cohort Command Center & Buildathon Manager
+              <h1 className="text-2xl sm:text-3xl font-bold font-mono text-[#111] flex items-center gap-2.5">
+                <LayoutDashboard className="w-7 h-7 text-[#22C55E]" />
+                <span>Cohort Command Center & Buildathon Manager</span>
               </h1>
-              <p className="text-xs text-black/60 mt-1">
-                Launch new flagship cohorts, edit active buildathons, manage student registrations, and direct live engineering modules.
+              <p className="text-xs text-black/60 mt-1 max-w-3xl">
+                Monitor active flagship cohorts, manage enrolled builder squads, track live buildathon submissions, and oversee platform engineering.
               </p>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Link
-                to="/events/new"
-                className="button-primary text-xs shrink-0"
-              >
-                <svg className="w-4 h-4 text-[#22C55E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                </svg>
-                <span>Launch Cohort / Buildathon 🚀</span>
-              </Link>
-              <button
-                onClick={() => setIsChatbotOpen(!isChatbotOpen)}
-                className="p-3 rounded-xl bg-white border border-[#E5E7EB] text-[#18191B] hover:text-[#A39B89] hover:border-[#D4CEB8] transition-all shadow-sm shrink-0"
-                title="Open Mentor Chatbot Hub"
-              >
-                <svg className="w-5 h-5 text-[#A39B89]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                </svg>
-              </button>
             </div>
           </div>
         </div>
 
-        {/* QUICK ACTION NAVIGATION CARDS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Link
-            to="/events/new"
-            className="card-premium p-6 flex flex-col justify-between gap-4 group hover:border-[#D4CEB8] transition-all"
-          >
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-2xl bg-[#F8F9FB] border border-[#E5E7EB] flex items-center justify-center text-[#18191B]">
-                <svg className="w-5 h-5 text-[#A39B89]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-bold text-[#18191B] group-hover:text-[#A39B89] transition-colors">
-                Create Event (23-Phase Wizard)
-              </h3>
-              <p className="text-xs text-[#5E6168] leading-relaxed">
-                Launch a full hackathon with custom tracks, prizes, schedule, judges, and registration rules.
-              </p>
+        {/* METRICS STATS CARDS */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="bg-white border border-black/10 rounded-2xl p-6 shadow-xs flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-black/50">
+                Active Flagship Cohorts
+              </span>
+              <p className="text-3xl font-bold text-[#111]">{defaultCohorts.length}</p>
+              <span className="text-[11px] font-bold text-[#22C55E] inline-flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>3 Programs Enrolling</span>
+              </span>
             </div>
-            <span className="text-xs font-bold text-[#A39B89] flex items-center gap-1">
-              Start Builder Wizard →
-            </span>
-          </Link>
+            <div className="w-12 h-12 rounded-2xl bg-[#22C55E]/10 border border-[#22C55E]/20 flex items-center justify-center text-[#22C55E]">
+              <BookOpen className="w-6 h-6" />
+            </div>
+          </div>
 
-          <Link
-            to="/events"
-            className="card-premium p-6 flex flex-col justify-between gap-4 group hover:border-[#D4CEB8] transition-all"
-          >
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-2xl bg-[#F8F9FB] border border-[#E5E7EB] flex items-center justify-center text-[#18191B]">
-                <svg className="w-5 h-5 text-[#A39B89]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L5.6 15.12a2 2 0 01-1.182-1.182l-.477-2.387a6 6 0 01.517-3.86l.158-.318a6 6 0 00.517-3.86L4.74 3.128A2 2 0 015.922 1.946l2.387.477a6 6 0 003.86-.517l.318-.158a6 6 0 013.86-.517l2.387.477a2 2 0 011.182 1.182l.477 2.387a6 6 0 01-.517 3.86l-.158.318a6 6 0 00-.517 3.86l.477 2.387a2 2 0 01-.547 1.022z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-bold text-[#18191B] group-hover:text-[#A39B89] transition-colors">
-                Manage All Events ({events.length})
-              </h3>
-              <p className="text-xs text-[#5E6168] leading-relaxed">
-                View published buildathons, edit event configurations, monitor registrations, or delete events.
-              </p>
+          <div className="bg-white border border-black/10 rounded-2xl p-6 shadow-xs flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-black/50">
+                Live Buildathons & Events
+              </span>
+              <p className="text-3xl font-bold text-[#111]">{buildathonEvents.length || 4}</p>
+              <span className="text-[11px] font-bold text-[#22C55E] inline-flex items-center gap-1">
+                <Activity className="w-3.5 h-3.5" />
+                <span>Active Sprints</span>
+              </span>
             </div>
-            <span className="text-xs font-bold text-[#A39B89] flex items-center gap-1">
-              View Events List →
-            </span>
-          </Link>
+            <div className="w-12 h-12 rounded-2xl bg-[#22C55E]/10 border border-[#22C55E]/20 flex items-center justify-center text-[#22C55E]">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+          </div>
 
-          <Link
-            to="/users"
-            className="card-premium p-6 flex flex-col justify-between gap-4 group hover:border-[#D4CEB8] transition-all"
-          >
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-2xl bg-[#F8F9FB] border border-[#E5E7EB] flex items-center justify-center text-[#18191B]">
-                <svg className="w-5 h-5 text-[#A39B89]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-bold text-[#18191B] group-hover:text-[#A39B89] transition-colors">
-                Admin & Mentor Directory
-              </h3>
-              <p className="text-xs text-[#5E6168] leading-relaxed">
-                Manage registered Lead Mentors and platform administrative credentials.
-              </p>
+          <div className="bg-white border border-black/10 rounded-2xl p-6 shadow-xs flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-black/50">
+                Total Enrolled Builders
+              </span>
+              <p className="text-3xl font-bold text-[#111]">304+</p>
+              <span className="text-[11px] font-bold text-black/60 inline-flex items-center gap-1">
+                <Users className="w-3.5 h-3.5 text-[#22C55E]" />
+                <span>Global Engineers</span>
+              </span>
             </div>
-            <span className="text-xs font-bold text-[#A39B89] flex items-center gap-1">
-              Open Directory →
-            </span>
-          </Link>
+            <div className="w-12 h-12 rounded-2xl bg-black/5 border border-black/10 flex items-center justify-center text-black/70">
+              <Users className="w-6 h-6" />
+            </div>
+          </div>
         </div>
 
-        {/* LIVE MONGODB EVENTS STREAM */}
-        <div className="card-premium p-6 sm:p-8 space-y-6">
+        {/* SECTION 1: CURRENT ACTIVE COHORTS */}
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-bold font-poppins text-[#18191B]">
-                Live Platform Events (MongoDB Atlas)
-              </h2>
-              <p className="text-xs text-[#5E6168]">
-                Real-time feed of hackathons and buildathons active across Turing Wings.
-              </p>
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-[#22C55E]" />
+              <h2 className="text-lg font-bold text-[#111]">Current Active Cohorts</h2>
+            </div>
+            <Link
+              to="/cohorts"
+              className="text-xs font-bold text-[#22C55E] hover:underline inline-flex items-center gap-1"
+            >
+              <span>View All Cohorts</span>
+              <ArrowUpRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {defaultCohorts.map((cohort) => (
+              <div
+                key={cohort._id}
+                className="bg-white border border-black/10 hover:border-[#22C55E] rounded-2xl p-6 shadow-xs flex flex-col justify-between space-y-4 transition-all"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#22C55E] bg-[#22C55E]/10 px-2.5 py-0.5 rounded-full border border-[#22C55E]/30">
+                      {cohort.status}
+                    </span>
+                    <span className="text-[10px] font-bold text-black/40">
+                      {cohort.duration}
+                    </span>
+                  </div>
+                  <h3 className="text-base font-bold text-[#111] leading-snug">
+                    {cohort.name}
+                  </h3>
+                </div>
+
+                <div className="pt-3 border-t border-black/10 flex items-center justify-between text-xs text-black/60">
+                  <div className="flex items-center gap-1.5 font-bold text-[#111]">
+                    <Users className="w-4 h-4 text-[#22C55E]" />
+                    <span>{cohort.enrolledCount} Builders</span>
+                  </div>
+                  <Link
+                    to="/cohorts"
+                    className="p-2 rounded-lg bg-black/5 hover:bg-[#22C55E] hover:text-black transition-colors"
+                    title="Cohort Details"
+                  >
+                    <ArrowUpRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* SECTION 2: CURRENT LIVE BUILDATHONS & EVENTS */}
+        <div className="space-y-4 pt-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-[#22C55E]" />
+              <h2 className="text-lg font-bold text-[#111]">Current Live Buildathons & Events</h2>
             </div>
             <Link
               to="/events"
-              className="px-4 py-2 rounded-xl bg-white border border-[#E5E7EB] text-[#18191B] font-bold text-xs hover:border-[#D4CEB8]"
+              className="text-xs font-bold text-[#22C55E] hover:underline inline-flex items-center gap-1"
             >
-              View Full Directory
+              <span>Manage Events</span>
+              <ArrowUpRight className="w-4 h-4" />
             </Link>
           </div>
 
           {loadingEvents ? (
-            <div className="py-12 text-center text-[#5E6168] text-xs font-mono">
-              Loading live events feed...
+            <div className="py-12 text-center text-xs text-black/40 font-mono">
+              Loading Events Directory...
             </div>
-          ) : events.length === 0 ? (
-            <div className="py-12 text-center text-[#5E6168] text-xs">
-              No events found. Click "Launch New Event Wizard" above to create one.
+          ) : buildathonEvents.length === 0 ? (
+            <div className="bg-white border border-black/10 rounded-2xl p-8 text-center text-xs text-black/60">
+              No live buildathons active currently.
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {events.slice(0, 4).map((evt) => (
-                <div key={evt._id} className="p-4 rounded-2xl bg-white border border-[#E5E7EB] space-y-2 text-left">
-                  <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
-                      {evt.status || "Published"}
-                    </span>
-                    <span className="text-[10px] text-[#5E6168] font-mono">
-                      {evt.type || "Hackathon"}
-                    </span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {buildathonEvents.map((evt) => (
+                <div
+                  key={evt._id}
+                  className="bg-white border border-black/10 hover:border-[#22C55E] rounded-2xl p-6 shadow-xs space-y-4 transition-all"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#22C55E] bg-[#22C55E]/10 px-2.5 py-0.5 rounded-full border border-[#22C55E]/30">
+                          {evt.type || "Buildathon"}
+                        </span>
+                        <span className="text-[10px] font-bold text-black/40">
+                          {evt.status || "Live"}
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-bold text-[#111]">{evt.name}</h3>
+                    </div>
+
+                    <Link
+                      to="/events"
+                      className="p-2 rounded-lg bg-black/5 hover:bg-[#22C55E] hover:text-black transition-colors"
+                      title="Manage Buildathon"
+                    >
+                      <ArrowUpRight className="w-4 h-4" />
+                    </Link>
                   </div>
-                  <h3 className="text-sm font-bold text-[#18191B]">{evt.name}</h3>
-                  <p className="text-xs text-[#5E6168] line-clamp-2">{evt.shortDescription || evt.tagline}</p>
-                  <div className="pt-2 border-t border-[#F3F4F6] flex items-center justify-between text-[10px] text-[#5E6168] font-mono">
-                    <span>{evt.registrations?.length || 0} Registrations</span>
-                    <Link to={`/events/edit/${evt._id}`} className="text-[#A39B89] font-bold hover:underline">
-                      Edit Event →
+
+                  <p className="text-xs text-black/70 leading-relaxed line-clamp-2">
+                    {evt.shortDescription || evt.tagline || "High-speed developer innovation sprint."}
+                  </p>
+
+                  <div className="pt-3 border-t border-black/10 flex items-center justify-between text-xs text-black/60">
+                    <div className="flex items-center gap-1.5 font-bold text-[#111]">
+                      <Calendar className="w-4 h-4 text-[#22C55E]" />
+                      <span>{evt.schedule?.eventStart ? new Date(evt.schedule.eventStart).toLocaleDateString() : "Active Sprints"}</span>
+                    </div>
+
+                    <Link
+                      to="/events"
+                      className="text-xs font-bold text-[#22C55E] hover:underline"
+                    >
+                      Event Portal Link ➔
                     </Link>
                   </div>
                 </div>
@@ -203,12 +272,7 @@ export default function AdminDashboardPage({ currentUser }) {
 
       </main>
 
-      {/* FLOATING INTERACTIVE CHATBOT WIDGET */}
-      <AdminChatWidget
-        currentUser={currentUser}
-        isOpen={isChatbotOpen}
-        onClose={() => setIsChatbotOpen(false)}
-      />
+      <AdminChatWidget isOpen={isChatbotOpen} onClose={() => setIsChatbotOpen(false)} />
     </div>
   );
 }

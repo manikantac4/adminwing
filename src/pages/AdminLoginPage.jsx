@@ -81,14 +81,6 @@ export default function AdminLoginPage({ setCurrentUser }) {
     }
   };
 
-  const handleQuickFill = () => {
-    setFormData({
-      usernameOrEmail: "mentor@turingwings.org",
-      password: "admin123password",
-    });
-    setError("");
-  };
-
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-[#090909] flex items-center justify-center p-4 sm:p-6 selection:bg-[#22C55E] selection:text-black font-mono">
       <div className="w-full max-w-md bg-white p-6 sm:p-10 rounded-3xl text-left border border-black/10 shadow-xl space-y-6 relative overflow-hidden">
@@ -182,16 +174,6 @@ export default function AdminLoginPage({ setCurrentUser }) {
               />
             </div>
           </div>
-
-          {/* Quick-Fill Auto Credentials Assistant */}
-          <button
-            type="button"
-            onClick={handleQuickFill}
-            className="w-full text-[10px] font-bold text-black/60 hover:text-[#22C55E] bg-black/5 hover:bg-[#22C55E]/10 py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 border border-black/5 hover:border-[#22C55E]/30 transition-all"
-          >
-            <Sparkles className="w-3 h-3 text-[#22C55E]" />
-            <span>Auto-fill Lead Mentor Credentials</span>
-          </button>
 
           {/* Main Submit Button Box */}
           <button

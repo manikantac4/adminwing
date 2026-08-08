@@ -113,7 +113,7 @@ export default function AdminCohortsListPage({ currentUser }) {
                 Cohorts Management Hub
               </h1>
               <p className="text-xs text-black/60 mt-1">
-                Launch new flagship cohorts, edit live curriculum modules, track builder enrollments, and configure cohort schedules.
+                Oversee flagship cohort programs, track enrolled builder squads, monitor curriculum modules, and configure active cohort schedules.
               </p>
             </div>
 
@@ -125,13 +125,6 @@ export default function AdminCohortsListPage({ currentUser }) {
               >
                 <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin text-[#22C55E]" : ""}`} />
               </button>
-              <Link
-                to="/events/new?type=Cohort"
-                className="button-primary text-xs shrink-0 inline-flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4 text-[#22C55E]" />
-                <span>Launch New Cohort</span>
-              </Link>
             </div>
           </div>
         </div>
@@ -158,14 +151,10 @@ export default function AdminCohortsListPage({ currentUser }) {
           ) : cohorts.length === 0 ? (
             <div className="card-premium p-12 text-center space-y-4 border border-black/10">
               <BookOpen className="w-10 h-10 text-black/30 mx-auto" />
-              <p className="text-sm font-bold text-[#111]">No Cohorts Found</p>
+              <p className="text-sm font-bold text-[#111]">No Cohorts Active</p>
               <p className="text-xs text-black/60 max-w-sm mx-auto">
-                No active cohorts found. Click the button below to launch your first flagship cohort.
+                No active cohorts found in the directory currently.
               </p>
-              <Link to="/events/new?type=Cohort" className="button-primary text-xs inline-flex items-center gap-2">
-                <Plus className="w-4 h-4 text-[#22C55E]" />
-                <span>Launch First Cohort</span>
-              </Link>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

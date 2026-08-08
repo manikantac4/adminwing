@@ -320,9 +320,13 @@ export default function AdminEventWizardPage({ currentUser }) {
       const url = id ? `${API_URL}/${id}` : API_URL;
       const method = id ? "PUT" : "POST";
 
+      const token = localStorage.getItem("turing_wings_token");
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify(payload),
       });
 
