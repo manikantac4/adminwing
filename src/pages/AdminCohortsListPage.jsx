@@ -178,23 +178,6 @@ export default function AdminCohortsListPage({ currentUser }) {
                       </div>
                       <h3 className="text-lg font-bold text-[#111]">{cohort.name}</h3>
                     </div>
-
-                    <div className="flex items-center gap-2">
-                      <Link
-                        to={`/events/edit/${cohort._id}`}
-                        className="p-2 rounded-lg bg-black/5 hover:bg-[#22C55E] hover:text-black transition-colors"
-                        title="Edit Cohort Settings"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(cohort._id, cohort.name)}
-                        className="p-2 rounded-lg bg-red-50 hover:bg-red-500 hover:text-white text-red-600 transition-colors"
-                        title="Delete Cohort"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
                   </div>
 
                   <p className="text-xs text-black/70 leading-relaxed">
@@ -207,13 +190,9 @@ export default function AdminCohortsListPage({ currentUser }) {
                       <span className="font-bold text-[#111]">{cohort.enrolledCount || 120}+ Enrolled Builders</span>
                     </div>
 
-                    <Link
-                      to={`/events/edit/${cohort._id}`}
-                      className="text-[11px] font-bold text-[#22C55E] hover:underline inline-flex items-center gap-1"
-                    >
-                      <span>Manage Curriculum</span>
-                      <ArrowUpRight className="w-3.5 h-3.5" />
-                    </Link>
+                    <span className="text-[11px] font-bold text-[#22C55E] bg-[#22C55E]/10 border border-[#22C55E]/30 px-3 py-1 rounded-full font-mono">
+                      Flagship Program
+                    </span>
                   </div>
                 </div>
               ))}
